@@ -1,0 +1,13 @@
+{
+  "name": "US175 Inventory",
+  "short_name": "US175 Inventory",
+  "start_url": "/Inventory/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": [
+    { "src": "../icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "../icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ]
+}
+

@@ -1,0 +1,69 @@
+{
+    "version": "2.0",
+    "routeKey": "POST /demo-query-inventory",
+    "rawPath": "/demo-query-inventory",
+    "rawQueryString": "",
+    "headers": {
+        "accept": "*/*",
+        "accept-encoding": "gzip, deflate, br",
+        "accept-language": "en-US,en;q=0.9",
+        "authorization": "eyJraWQiOiJ5TVI0NE1XWlVNNkE5b0ZpR1hoRFlvR2kyWVYwQzMzdE1FZEErc1liRzV3PSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI5ZGFlMDIzMi04MjNmLTRjOGYtOGIxNi05ZDdmZGI1MTVhMTQiLCJjb2duaXRvOmdyb3VwcyI6WyJ1czE3NXVzZXJzIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy1lYXN0LTIuYW1hem9uYXdzLmNvbVwvdXMtZWFzdC0yX3hya2g2a2FXZyIsInZlcnNpb24iOjIsImNsaWVudF9pZCI6IjE2dmczc3ZyZ2E4aXAzNWRscnE5NWdrNmxhIiwib3JpZ2luX2p0aSI6ImIyZmJkYjZjLWYyMjMtNDk0Zi1hMDY0LTk3MWY5MjhmYWYxMCIsImV2ZW50X2lkIjoiMTkyMzVjNWEtY2MzNS00NjRhLWJjMGYtMTcyY2UyODMzYjE5IiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJvcGVuaWQiLCJhdXRoX3RpbWUiOjE3MDM5NDY4MzgsImV4cCI6MTcwNDAzMzIzOCwiaWF0IjoxNzAzOTQ2ODM4LCJqdGkiOiI3MmI3MzY2OS00YTAwLTRlY2YtODA1Zi1iNjRhODAwODZjOTciLCJ1c2VybmFtZSI6IjlkYWUwMjMyLTgyM2YtNGM4Zi04YjE2LTlkN2ZkYjUxNWExNCJ9.iZ5jFZ46imf_6HR0bVi0lTXz6QihOuHehiMhJa45tnwWUra8AG6rlrzfPB7rueryLA7mPQ8i0I-7kGX6llfBHfr_TO10GtvHDVa4M0RgXgVZ1eRiH0fAWIR2YIWvlder9LjoOwWNnJx2mLQDCsPGs6DpF_UeL0cuU3MBAqa_y-N3wZKbLXuLC4ooxS8FdPlUMyfQr6ECVFK_0YUNaLuYpg8IDw_SbO2N5Wn6VZiB6o4CdUeS5BVnnCXRVa9X0bLHgXwyR_xYumgahf0PH8hvA5pqQb4SVZrzYMPQDekBnFyUMRpBIfOVkp8iWGQALVvMqWmfM2_ayd7nTIo66uO4qQ",
+        "content-length": "151",
+        "content-type": "application/json",
+        "host": "jg46ltuhdl.execute-api.us-east-2.amazonaws.com",
+        "origin": "https://dev.txn.us175.com",
+        "referer": "https://dev.txn.us175.com/",
+        "sec-ch-ua": "'Chromium\";v=\"117\", \"Not;A=Brand\";v=\"8\"'",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "Linux",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "cross-site",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+        "x-amzn-trace-id": "Root=1-65902a73-0c376e1a47c84b9f3b18cbd8",
+        "x-forwarded-for": "172.73.179.196",
+        "x-forwarded-port": "443",
+        "x-forwarded-proto": "https"
+    },
+    "requestContext": {
+        "accountId": "234252873463",
+        "apiId": "jg46ltuhdl",
+        "authorizer": {
+            "jwt": {
+                "claims": {
+                    "auth_time": "1703946838",
+                    "client_id": "16vg3svrga8ip35dlrq95gk6la",
+                    "cognito:groups": "[us175users]",
+                    "event_id": "19235c5a-cc35-464a-bc0f-172ce2833b19",
+                    "exp": "1704033238",
+                    "iat": "1703946838",
+                    "iss": "https://cognito-idp.us-east-2.amazonaws.com/us-east-2_xrkh6kaWg",
+                    "jti": "72b73669-4a00-4ecf-805f-b64a80086c97",
+                    "origin_jti": "b2fbdb6c-f223-494f-a064-971f928faf10",
+                    "scope": "openid",
+                    "sub": "9dae0232-823f-4c8f-8b16-9d7fdb515a14",
+                    "token_use": "access",
+                    "username": "9dae0232-823f-4c8f-8b16-9d7fdb515a14",
+                    "version": "2"
+                },
+                "scopes": "None"
+            }
+        },
+        "domainName": "jg46ltuhdl.execute-api.us-east-2.amazonaws.com",
+        "domainPrefix": "jg46ltuhdl",
+        "http": {
+            "method": "POST",
+            "path": "/demo-query-inventory",
+            "protocol": "HTTP/1.1",
+            "sourceIp": "172.73.179.196",
+            "userAgent": "\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36\""
+        },
+        "requestId": "QwuSDhiOCYcEMPA=",
+        "routeKey": "POST /demo-query-inventory",
+        "stage": "$default",
+        "time": "30/Dec/2023:14:34:27 +0000",
+        "timeEpoch": 1703946867242
+    },
+    "body": "{\"Year\":\"2010\",\"Set\":\"Heritage\",\"Subset\":\"Chrome Black Refractor\",\"Qty\":0}",
+    "isBase64Encoded": "False"
+}

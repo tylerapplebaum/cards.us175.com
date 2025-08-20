@@ -1,0 +1,414 @@
+/*
+@font-face {
+    font-family: OpenSans-Regular;
+    src: url(../fonts/OpenSans/OpenSans-Regular.ttf)
+}
+*/
+@font-face {
+  font-family: CervoNeue-Regular;
+  src: url(../../fonts/CervoNeue/cervoneue-regularneue-webfont.woff)
+    format("woff");
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body,
+html {
+  height: 100%;
+  font-family: CervoNeue-Regular;
+}
+
+a {
+  margin: 0;
+  transition: all 0.4s;
+  -webkit-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+}
+
+a:focus {
+  outline: none !important;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 5px;
+}
+
+p {
+  margin: 5px;
+}
+
+ul,
+li {
+  margin: 0;
+  list-style-type: none;
+}
+
+datalist,
+datalist option {
+  font-family: inherit;
+}
+
+#browserdata option {
+  font-family: inherit;
+}
+
+input {
+  font-family: inherit;
+  font-size: 100%;
+  display: block;
+  outline: none;
+  /* border: none !important */
+}
+
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+  display: block;
+  outline: none;
+}
+
+textarea:focus,
+input:focus {
+  border-color: transparent !important;
+}
+
+button {
+  font-family: inherit;
+  font-size: 100%;
+  padding: 5px;
+  border: 2px solid #333;
+  border-radius: 5px;
+  background: 0 0;
+}
+
+div#searchToggle {
+  transform: rotate(90deg);
+}
+
+select#setSearchList {
+  width: 250px;
+}
+
+select#playerSearchList {
+  width: 250px;
+}
+
+input#yearInput {
+  width: 80px;
+}
+
+input#gradeInput {
+  width: 80px;
+}
+
+input#priceInput {
+  width: 100px;
+}
+
+input#itemtypeInput {
+  width: 120px;
+}
+
+input#txnsourceInput {
+  width: 160px;
+}
+
+iframe {
+  border: none !important;
+}
+
+.limiter {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.container-fluid {
+  /* Bootstrap addition */
+  padding-top: 3px;
+}
+
+.container-table100 {
+  width: 100%;
+  min-height: 100vh;
+  background: #4d7cb9;
+  background: -webkit-linear-gradient(45deg, #41d0a5, #4d7cb9);
+  background: -o-linear-gradient(45deg, #41d0a5, #4d7cb9);
+  background: -moz-linear-gradient(45deg, #41d0a5, #4d7cb9);
+  background: linear-gradient(45deg, #41d0a5, #4d7cb9);
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 15px 30px;
+}
+
+table {
+  border-spacing: 1;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+}
+
+table * {
+  position: relative;
+}
+
+table td,
+table th {
+  padding-left: 8px;
+}
+
+table thead tr {
+  height: 60px;
+  background: #36304a;
+}
+
+table tbody tr {
+  height: 50px;
+}
+
+table tbody tr:last-child {
+  border: 0;
+}
+
+table td,
+table th {
+  text-align: left;
+}
+
+table td.l,
+table th.l {
+  text-align: right;
+}
+
+table td.c,
+table th.c {
+  text-align: center;
+}
+
+table td.r,
+table th.r {
+  text-align: center;
+}
+
+.table100-head th {
+  font-family: CervoNeue-Regular;
+  font-size: 18px;
+  color: #fff;
+  line-height: 1.2;
+  font-weight: unset;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f5f5f5;
+}
+
+tbody tr {
+  font-family: CervoNeue-Regular;
+  font-size: 15px;
+  color: #232f3e;
+  line-height: 1.2;
+  font-weight: unset;
+}
+
+tbody tr:hover {
+  color: #555;
+  background-color: #f5f5f5;
+  cursor: pointer;
+}
+
+.column1 {
+  width: 100px;
+  padding-left: 10px;
+}
+
+.column2 {
+  width: 150px;
+}
+
+.column3 {
+  width: 150px;
+}
+
+.column4 {
+  width: 150px;
+}
+
+.column5 {
+  width: 100px;
+}
+
+.column6 {
+  width: 100px;
+}
+
+.column7 {
+  width: 100px;
+}
+
+.column8 {
+  width: 100px;
+}
+
+.column9 {
+  width: 90px;
+}
+
+.column10 {
+  width: 90px;
+}
+
+.column11 {
+  width: 165px;
+}
+
+.column12 {
+  width: 90px;
+}
+
+.column13 {
+  width: 90px;
+}
+
+.column14 {
+  width: 90px;
+}
+
+.column15 {
+  width: 165px;
+}
+.update-transition {
+  transition: all 100ms ease-out;
+}
+@media screen and (max-width: 992px) {
+  table {
+    display: block;
+  }
+
+  table > *,
+  table tr,
+  table td,
+  table th {
+    display: block;
+  }
+
+  table thead {
+    display: none;
+  }
+
+  table tbody tr {
+    height: auto;
+    padding: 37px 0;
+  }
+
+  table tbody tr td {
+    padding-left: 40% !important;
+    margin-bottom: 24px;
+  }
+
+  table tbody tr td:last-child {
+    margin-bottom: 0;
+  }
+
+  table tbody tr td:before {
+    font-family: CervoNeue-Regular;
+    font-size: 14px;
+    color: #999;
+    line-height: 1.2;
+    font-weight: unset;
+    position: absolute;
+    width: 40%;
+    left: 30px;
+    top: 0;
+  }
+
+  table tbody tr td:nth-child(1):before {
+    content: "ID";
+  }
+
+  table tbody tr td:nth-child(2):before {
+    content: "Year";
+  }
+
+  table tbody tr td:nth-child(3):before {
+    content: "Set";
+  }
+
+  table tbody tr td:nth-child(4):before {
+    content: "Subset";
+  }
+
+  table tbody tr td:nth-child(5):before {
+    content: "Player";
+  }
+
+  table tbody tr td:nth-child(6):before {
+    content: "Grade";
+  }
+
+  table tbody tr td:nth-child(7):before {
+    content: "Item Type";
+  }
+  table tbody tr td:nth-child(8):before {
+    content: "Price";
+  }
+  table tbody tr td:nth-child(9):before {
+    content: "Date";
+  }
+  table tbody tr td:nth-child(10):before {
+    content: "Source";
+  }
+  table tbody tr td:nth-child(11):before {
+    content: "Screenshot";
+  }
+
+  .column1,
+  .column2,
+  .column3,
+  .column4,
+  .column5,
+  .column6,
+  .column7,
+  .column8,
+  .column9,
+  .column10,
+  .column11,
+  .column12,
+  .column13,
+  .column14,
+  .column15 {
+    width: 100%;
+    text-align: left;
+  }
+
+  tbody tr {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  .container-table100 {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}

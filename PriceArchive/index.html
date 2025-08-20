@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>US175 Price Archive</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <script src="../js/jsrsasign-latest-all-min.js"></script>
+  <script src="../js/verifier.js"></script>
+  <script src="js/userprofile.js"></script>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" type="text/css" href="../vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="../fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="../vendor/animate/animate.css">
+  <link rel="stylesheet" type="text/css" href="../vendor/select2/select2.min.css">
+  <link rel="stylesheet" type="text/css" href="../vendor/perfect-scrollbar/perfect-scrollbar.css">
+  <link rel="stylesheet" type="text/css" href="../css/util.css">
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+  <style>
+	.update-transition {
+        	transition: all 100ms ease-out;
+	}
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">
+      <img src="icon.svg" width="30" height="30" class="d-inline-block align-top" alt="us175-price-archive-icon">
+      US175
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto align-items-center">
+        <li class="nav-item active">
+          <a class="nav-link text-nowrap" href="https://dev.txn.us175.com/PriceArchive/">Price Archive <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://dev.txn.us175.com/Inventory/">Inventory</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://dev.txn.us175.com/">Transactions</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://gallery.us175.com/">Gallery</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://inv.us175.com/wantlist">Wantlist</a>
+        </li>
+        <li class="w-100 mb-3 mb-lg-0">
+          <button class="btn btn-outline-success my-2 my-sm-0 w-100" type="button" data-toggle="collapse" data-target="#createFormCollapse" aria-expanded="false" aria-controls="createFormCollapse">Create Archived Price</button>
+        </li>
+      </ul>
+      <!-- Form for searching existing transactions -->
+      <form id="existingForm" class="form-inline">
+        <input type="date" id="startDate" class="form-control mb-2 mr-sm-2">
+        <input type="date" id="endDate" class="form-control mb-2 mr-sm-2">
+        <!-- Default checked -->
+        <div class="custom-control custom-switch" id="searchToggle">
+          <input type="checkbox" class="custom-control-input" id="customSwitch1" onchange="toggleSetPlayer()" checked>
+          <label class="custom-control-label" for="customSwitch1"></label>
+        </div>
+        <select class="custom-select form-control mb-2 mr-sm-2 flex-grow-1" id="setSearchList">
+          <option selected value="">Select set...</option>
+        </select>
+        <select class="d-none custom-select form-control mb-2 mr-sm-2" id="playerSearchList">
+          <option selected value="">Select player...</option>
+        </select>
+        <button type="submit" class="btn btn-outline-info mb-2 flex-grow-1">Search Archived Prices</button>
+      </form>
+    </div>
+  </nav>
+  <!-- Form for creating a new Transaction -->
+  <div class="container-fluid">
+  <div class="collapse" id="createFormCollapse">
+  <form id="createForm" class="form-inline">
+    <input type="text" id="yearInput" placeholder="Year" class="form-control mb-2 mr-sm-2 flex-grow-1" required>
+    <input type="text" id="setInput" placeholder="Set" class="form-control mb-2 mr-sm-2" required>
+    <input type="text" id="subsetInput" placeholder="Subset" class="form-control mb-2 mr-sm-2">
+    <input type="text" id="playerInput" placeholder="Player" class="form-control mb-2 mr-sm-2">
+    <input type="text" id="gradeInput" placeholder="Grade" class="form-control mb-2 mr-sm-2 flex-grow-1">
+    <input type="date" id="txnDate" value="" class="form-control mb-2 mr-sm-2" required>
+    <input type="number" step=".01" id="priceInput" placeholder="Price" class="form-control mb-2 mr-sm-2 flex-grow-1" required>
+    <input type="text" id="itemtypeInput" placeholder="ItemType" list="ItemList" class="form-control mb-2 mr-sm-2 flex-grow-1" required>
+      <datalist id="ItemList">
+        <option value="Single"></option>
+        <option value="Pack"></option>
+        <option value="Box"></option>
+        <option value="Case"></option>
+      </datalist>
+    <input type="text" id="txnsourceInput" placeholder="Source" list="TxnSourceList" class="form-control mb-2 mr-sm-2 flex-grow-1" required>
+      <datalist id="TxnSourceList">
+        <option value="eBay"></option>
+        <option value="Blowout Forums"></option>
+        <option value="/r/baseballcards"></option>
+        <option value="Card Show"></option>
+        <option value="Topps/Fanatics"></option>
+        <option value="Auction House"></option>
+      </datalist>
+      <input type="file" class="form-control-custom mb-2 mr-sm-2" id="screenshotInput" accept=".jpg, .jpeg, .png">
+    <button id="add-archived" type="submit" class="btn btn-primary mb-2 flex-grow-1">
+      Add Archived Price
+    </button>
+  </form>
+  </div>
+  </div>
+  <div class="container-fluid">
+    <div class="input-group">
+      <div class="input-group-prepend">
+          <div class="form-group">
+            <select class="custom-select custom-select-lg" id="tableFilterSelect">
+              <option selected value="column2">Set</option>
+              <option value="column1">Year</option>
+              <option value="column4">Player</option>
+              <option value="column3">Subset</option>
+              <option value="column8">Date</option>
+            </select>
+          </div>
+      </div>
+      <input type="text" id="tableFilter" onkeyup="tableFilterFunction()" placeholder="Filter results" class="form-control form-control-lg mb-3" aria-label="Text input with dropdown button">
+      <button type="button" class="btn btn-primary mb-3">
+        Results <span class="badge badge-light" id="num-results">0</span>
+        <span class="sr-only">number of results returned</span>
+      </button>
+    </div>
+    </div>
+  <div class="limiter">
+  <div class="container-table100">
+  <div class="table100 w-100">
+  <div>
+  <table id="itemsTable">
+    <thead>
+      <tr class="table100-head">
+        <th scope="col" class="column0" hidden>ArchiveId</th>
+        <th scope="col" class="column1">Year</th>
+        <th scope="col" class="column2">Set</th>
+        <th scope="col" class="column3">Subset</th>
+		    <th scope="col" class="column4">Player</th>
+        <th scope="col" class="column5">Grade</th>
+		    <th scope="col" class="column6">ItemType</th>
+		    <th scope="col" class="column7">Price</th>
+		    <th scope="col" class="column8">Date</th>
+		    <th scope="col" class="column9">Source</th>
+		    <th scope="col" class="column10">Screenshot</th>
+        <th scope="col" class="column11">Action   <a href="javascript:void(0);" onclick="editRowsFunction()"><img class="locked" id="edit-table-rows-icon" src="../img/edit-lock.svg" width="30" height="30" alt="edit-table-rows-icon"></a></th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  </div>
+  </div>
+  </div>
+  </div>
+  <script src="../vendor/jquery/jquery-3.2.1.min.js"></script>
+  <script src="../vendor/bootstrap/js/popper.js"></script>
+  <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+  <script src="../vendor/select2/select2.min.js"></script>
+  <script src="../js/main.js"></script>
+
+  <script>
+    function toggleSetPlayer() {
+      const setSearch = 'document.getElementById("setSearchList")';
+      const playerSearch = 'document.getElementById("playerSearchList")';
+      if (!Boolean(document.getElementById("setSearchList").classList.contains('d-none'))) {
+        // case: first toggle hit. Add the class d-none first
+        document.getElementById("setSearchList").classList.add('d-none');
+        // playerSearchList can toggle immediately because it defaults to d-none
+        document.getElementById("playerSearchList").classList.toggle('d-none');
+      } else {
+        // case: hitting the toggle n + 1 times
+        document.getElementById("playerSearchList").classList.toggle('d-none');
+        document.getElementById("setSearchList").classList.toggle('d-none');
+      }
+
+    }
+    function tableFilterFunction() {
+      // https://www.w3schools.com/howto/howto_js_filter_table.asp
+      // https://stackoverflow.com/a/1085810
+      // Declare variables
+      var input, filter, table, tr, td, i, txtValue, columnSelect;
+      columns = document.getElementById("tableFilterSelect");
+      columnSelect = columns.value;
+      input = document.getElementById("tableFilter");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("itemsTable");
+      tr = table.getElementsByTagName("tr");
+    
+      // Loop through all table rows, and hide those who don't match the search query
+      for (i = 1; i < tr.length; i++) { // starting at 1 to exclude header
+        td = tr[i].getElementsByClassName(columnSelect)[0];
+        if (td) {
+          txtValue = td.textContent || td.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
+      }
+    }
+    </script>
+  <script>
+    function editRowsFunction() {
+      var editicon = document.getElementById("edit-table-rows-icon");
+      if (editicon.classList.value == 'locked') {
+        // case: default on page load
+        document.querySelectorAll("td[contenteditable='false']").forEach(elem => elem.setAttribute("contenteditable", "true"));
+        editicon.src = '../img/edit-unlock.svg'
+        editicon.classList.value = 'unlocked'
+        console.log("Rows unlocked for editing")
+      } else {
+        // locking after an unlock
+        document.querySelectorAll("td[contenteditable='true']").forEach(elem => elem.setAttribute("contenteditable", "false"));
+        editicon.src = '../img/edit-lock.svg'
+        editicon.classList.value = 'locked'
+        console.log("Rows locked for editing")     
+      }
+    } // end editRowsFunction
+  </script>
+  <script>
+    function setDates(id, value) {
+      // https://stackoverflow.com/a/14649259
+      var dateField = document.getElementById(id);
+      dateField.setAttribute("value", value);
+    }
+      // https://stackoverflow.com/a/13572682
+      var today = new Date(), y = today.getFullYear(), m = today.getMonth();
+      var beginMonth = new Date(y, m, 1);
+    window.onload = function() {
+      setDates("startDate",beginMonth.toLocaleDateString('fr-CA'));
+      setDates("endDate",today.toLocaleDateString('fr-CA'));
+      setDates("txnDate",today.toLocaleDateString('fr-CA'));
+    }
+  </script>
+  <script>
+    // Fetch existing items and populate the table on page load
+	document.getElementById('existingForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+	  fetchItems();
+	});
+	
+    // Event listener for the create form submission
+    document.getElementById('createForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      createItem();
+    });
+
+    // Fetch existing items and populate the table    
+    function fetchItems() {
+      var set = document.getElementById('setSearchList').value;
+      var player = document.getElementById('playerSearchList').value;
+      var data = {
+        Set: set,
+        Player: player
+      };
+      console.log(data)
+      fetch('https://jg46ltuhdl.execute-api.us-east-2.amazonaws.com/demo-query-price-archive', {
+        method: 'POST',
+        withCredentials: true,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': cognitoAccessToken
+        },
+        body: JSON.stringify(data)
+      })
+	    .then(response => response.json())
+        .then(data => {
+          idnum = 0;
+		      console.log(data)
+          const itemsTable = document.getElementById('itemsTable');
+          const tbody = itemsTable.getElementsByTagName('tbody')[0];
+          document.getElementById('num-results').innerHTML = data.body.length;
+          tbody.innerHTML = '';
+          data.body.forEach(item => {
+            // console.log(item)
+            const row = document.createElement('tr');
+		        row.classList.add("update-transition")
+            row.id = 'row' + idnum; // uniquely identify each row for update/delete actions
+            if (item.Subset === '') { // hacky workaround to correctly display items with empty property value in mobile view
+              item['Subset'] = '<br>'
+            }
+            if (item.Grade === '') {
+              item['Grade'] = '<br>'
+            }
+            row.innerHTML = `
+              <td class="column0" hidden>${item.ArchiveId}</td>
+              <td class="column1 mb-2 mb-lg-4" contenteditable="false">${item.Year}</td>
+              <td class="column2 mb-2 mb-lg-4" contenteditable="false">${item.Set}</td>
+              <td class="column3 mb-2 mb-lg-4" contenteditable="false">${item.Subset}</td>
+              <td class="column4 mb-2 mb-lg-4" contenteditable="false">${item.Player}</td>
+              <td class="column5 mb-2 mb-lg-4" contenteditable="false">${item.Grade}</td>
+              <td class="column6 mb-2 mb-lg-4" contenteditable="false">${item.ItemType}</td>
+              <td class="column7 mb-2 mb-lg-4" contenteditable="false">${item.Price}</td>
+              <td class="column8 mb-2 mb-lg-4" contenteditable="false">${item.Date}</td>
+              <td class="column9 mb-2 mb-lg-4" contenteditable="false">${item.Source}</td>
+              <td class="column10 mb-2 mb-lg-4"><a href="${item.Screenshot}" target="_blank" rel="noopener noreferrer"><img src="photo-icon.png" class="img-fluid" alt="screenshot" /></a></td>
+              <td class="column11 p-3 mt-3 d-flex flex-column d-lg-block mt-lg-0 p-lg-2">
+                <button onclick="updateItem('${item.ArchiveId}')" class="btn btn-warning mb-2 mb-lg-0">Update</button>
+                <button onclick="deleteItem('${item.ArchiveId}')" class="btn btn-danger">Delete</button>
+              </td>
+            `;
+            tbody.appendChild(row);
+            ++idnum;
+          });
+        })
+        .catch(error => console.error('Error:', error));
+        document.getElementById('setSearchList').value = ''; // clear it out
+        document.getElementById('playerSearchList').value = '';
+    }
+
+    // Create a new item
+    function createItem() {
+      document.getElementById("add-archived").innerHTML = 'Loading...';
+      const element = '<span id="add-archived-spin" class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>';
+      document.getElementById("add-archived").insertAdjacentHTML("afterbegin",element);
+      // document.getElementById("add-archived-spin").classList.remove('invisible');
+      const year = document.getElementById('yearInput').value;
+      const set = document.getElementById('setInput').value;
+      const subset = document.getElementById('subsetInput').value;
+      const player = document.getElementById('playerInput').value;
+      const grade = document.getElementById('gradeInput').value;
+      const txnDate = document.getElementById('txnDate').value;
+      const itemtype = document.getElementById('itemtypeInput').value;
+      const price = document.getElementById('priceInput').value;
+      const txnsource = document.getElementById('txnsourceInput').value;
+      const data = {
+        Year: year,
+        Set: set,
+        Subset: subset,
+        Players: player,
+        Grade: grade,
+        TxnDate: txnDate,
+        ItemType: itemtype,
+        Price: price,
+        Source: txnsource,
+        Screenshot: window.b64Image,
+        Mimetype: window.mimetype
+      };
+
+      fetch('https://jg46ltuhdl.execute-api.us-east-2.amazonaws.com/demo-receive-event-price-archive', {
+        method: 'POST',
+        withCredentials: true,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': cognitoAccessToken
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Item created:', data);
+        // fetchItems(); // Refresh the table
+        statusCode = data.StatusCode;
+        if (statusCode =='200') {
+          document.getElementById("add-archived").innerHTML = 'Success';
+          document.getElementById("add-archived").classList.remove('btn-primary');
+          document.getElementById("add-archived").classList.add('btn-success');
+          setTimeout(function() {
+            // reset button to normal status after 2 seconds
+            document.getElementById("add-archived").classList.remove('btn-success');
+            document.getElementById("add-archived").classList.add('btn-primary');
+            document.getElementById("add-archived").innerHTML = 'Add Archived Price';
+            // document.getElementById("add-archived-spin").classList.add('invisible');
+          }, 2000);
+        } else {
+          document.getElementById("add-archived").innerHTML = 'Error';
+          document.getElementById("add-archived").classList.remove('btn-primary');
+          document.getElementById("add-archived").classList.add('btn-danger');
+        };
+        document.getElementById('createForm').reset(); // Reset the form
+      })
+      .catch(error => console.error('Error:', error));
+    } // end createItem
+
+    // Update an existing item
+    function updateItem(ArchiveId) {
+      // Implement the update logic based on your API endpoint
+      var rows = document.getElementsByClassName("column0");
+      // find the row that the ArchiveId belongs to so that we can gather correct data to update
+      for (let z = 0; z < rows.length; z++) {
+        if (rows[z].innerHTML == ArchiveId) {
+            rowId = rows[z].parentElement.id
+            break;
+        }
+      }
+      const updaterow = document.getElementById(rowId);
+      // If Enter is accidentally pressed, <br> is added & must be sanitized
+      const year = (updaterow.cells[1].innerHTML).replaceAll('<br>','');
+      const set = (updaterow.cells[2].innerHTML).replaceAll('<br>','');
+      const subset = (updaterow.cells[3].innerHTML).replaceAll('<br>','');
+      const player = (updaterow.cells[4].innerHTML).replaceAll('<br>','');
+      const grade = (updaterow.cells[5].innerHTML).replaceAll('<br>','');
+      const itemtype = (updaterow.cells[6].innerHTML).replaceAll('<br>','');
+      const price = (updaterow.cells[7].innerHTML).replaceAll('<br>','');
+      const txndate = (updaterow.cells[8].innerHTML).replaceAll('<br>','');
+      const txnsource = (updaterow.cells[9].innerHTML).replaceAll('<br>','');
+      const data = {
+        ArchiveId: ArchiveId,
+        Year: year,
+        Set: set,
+        Subset: subset,
+        Players: player,
+        Grade: grade,
+        ItemType: itemtype,
+        Price: price,
+        TxnDate: txndate,
+        Source: txnsource
+      };
+      console.log('Update item with ID:', ArchiveId);
+      console.log(data);
+      fetch('https://jg46ltuhdl.execute-api.us-east-2.amazonaws.com/demo-update-event-price-archive', {
+        method: 'POST',
+        withCredentials: true,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': cognitoAccessToken
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Item updated:', data);
+        // fetchItems(); // Refresh the table
+        statusCode = data.StatusCode;
+        if (statusCode == '200') {
+          updaterow.style.backgroundColor = "#28a745";
+          //updaterow.style.background = "linear-gradient(to top, lime, 20%, cyan)";
+          setTimeout(() => {
+            updaterow.style.background = "";
+          }, 750);
+          console.log('Updated rowId:' + rowId + ' HTTP status: ' + statusCode);
+          //document.getElementById(rowId).outerHTML = '';
+        } else {
+		      updaterow.style.backgroundColor = "#dc3545";
+          //updaterow.style.background = "linear-gradient(to top, coral, 20%, crimson)"
+		      setTimeout(() => {
+            updaterow.style.backgroundColor = "";
+          }, 750);
+          //document.getElementById(rowId).innerHTML = 'Error';
+          console.log('Error updating' + rowId + ' HTTP error: ' + statusCode)
+        };
+      })
+      .catch(error => console.error('Error:', error));
+    } // end updateItem
+
+    // Delete an item
+    function deleteItem(ArchiveId) {
+      // Implement the delete logic based on your API endpoint
+      var rows = document.getElementsByClassName("column0");
+      // find the row that the ArchiveId belongs to so that we can delete from the DOM after success
+      for (let z = 0; z < rows.length; z++) {
+        if (rows[z].innerHTML == ArchiveId) {
+            rowId = rows[z].parentElement.id
+            break;
+        }
+      }
+      const data = {
+        ArchiveId: ArchiveId,
+      };
+      console.log('Delete item with ID:', ArchiveId);
+      fetch('https://jg46ltuhdl.execute-api.us-east-2.amazonaws.com/demo-delete-event-price-archive', {
+        method: 'POST',
+        withCredentials: true,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': cognitoAccessToken
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Item deleted:', data);
+        // fetchItems(); // Refresh the table
+        statusCode = data.StatusCode;
+        if (statusCode == '200') {
+          console.log('Deleting rowId:' + rowId);
+          document.getElementById(rowId).outerHTML = '';
+          console.log(statusCode)
+        } else {
+          //document.getElementById(rowId).innerHTML = 'Error';
+          console.log(statusCode)
+        };
+      })
+      .catch(error => console.error('Error:', error));
+    } // end deleteItem
+
+    function fetchSets() {
+      fetch('https://dev.txn.us175.com/PriceArchive/sets.json', {
+		  method: 'GET'
+      })
+      .then(response => response.json()
+        .then(data => {
+          console.log(data);
+          var list = document.getElementById('setSearchList');
+          data.Sets.forEach(item => {
+            const option = document.createElement('option');
+            //option.value = item;
+            option.innerHTML = `
+              <option value="${item}">${item}</td>
+            `
+            list.appendChild(option);
+          })
+        }
+        )
+      )
+    } // end fetchSets
+    function fetchPlayers() {
+      fetch('https://dev.txn.us175.com/PriceArchive/players.json', {
+		  method: 'GET'
+      })
+      .then(response => response.json()
+        .then(data => {
+          console.log(data);
+          var list = document.getElementById('playerSearchList');
+          data.Players.forEach(item => {
+            const option = document.createElement('option');
+            //option.value = item;
+            option.innerHTML = `
+              <option value="${item}">${item}</td>
+            `
+            list.appendChild(option);
+          })
+        }
+        )
+      )
+    } // end fetchPlayers
+    document.addEventListener("DOMContentLoaded", function () {
+      fetchSets();
+      fetchPlayers();
+    });
+
+    function convertImageToBase64() {
+      // https://stackoverflow.com/a/65926546
+      const fileSelector = document.getElementById('screenshotInput');
+      fileSelector.addEventListener('change', (event) => {
+        const fileList = event.target.files[0];
+        // console.log(fileList);
+        // encode the file using the FileReader API
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          // use a regex to remove data url part
+          const base64String = reader.result
+          window.mimetype = base64String.match(/image\/\w+/)[0]
+          console.log(window.mimetype)
+          // console.log(base64String);
+          window.b64Image = base64String
+            .replace('data:', '')
+            .replace(/^.+,/, '');
+        };
+        reader.readAsDataURL(fileList);
+      });
+    }
+    convertImageToBase64();
+  </script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+openapi: "3.0.1"
+info:
+  title: "dev-txn-api"
+  version: "2025-08-19 12:21:05UTC"
+servers:
+- url: "https://jg46ltuhdl.execute-api.us-east-2.amazonaws.com/{basePath}"
+  variables:
+    basePath:
+      default: ""
+paths:
+  /demo-transactions:
+    get:
+      responses:
+        default:
+          description: "Default response for GET /demo-transactions"
+      security:
+      - us175-cognito-jwt: []
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:us-east-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-2:234252873463:function:demo-get-transations/invocations"
+        connectionType: "INTERNET"
+  /demo-bulk-upload-inventory:
+    post:
+      responses:
+        default:
+          description: "Default response for POST /demo-bulk-upload-inventory"
+      security:
+      - us175-lambda-authorizer-HTTP-API: []
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:us-east-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-2:234252873463:function:demo-us175-bulk-add-inventory/invocations"
+        connectionType: "INTERNET"
+  /demo-delete-event-price-archive:
+    post:
+      responses:
+        default:
+          description: "Default response for POST /demo-delete-event-price-archive"
+      security:
+      - us175-cognito-jwt: []
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:us-east-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-2:234252873463:function:demo-delete-event-price-archive/invocations"
+        connectionType: "INTERNET"
+  /demo-delete-inventory:
+    post:
+      responses:
+        default:
+          description: "Default response for POST /demo-delete-inventory"
+      security:
+      - us175-lambda-authorizer-HTTP-API: []
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:us-east-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-2:234252873463:function:demo-delete-inventory/invocations"
+        connectionType: "INTERNET"
+  /demo-query-inventory:
+    post:
+      responses:
+        default:
+          description: "Default response for POST /demo-query-inventory"
+      security:
+      - us175-lambda-authorizer-HTTP-API: []
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:us-east-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-2:234252873463:function:demo-get-inventory/invocations"
+        connectionType: "INTERNET"
+  /demo-query-price-archive:
+    post:
+      responses:
+        default:
+          description: "Default response for POST /demo-query-price-archive"
+      security:
+      - us175-cognito-jwt: []
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:us-east-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-2:234252873463:function:demo-get-price-archive/invocations"
+        connectionType: "INTERNET"
+  /demo-receive-event:
+    post:
+      responses:
+        default:
+          description: "Default response for POST /demo-receive-event"
+      security:
+      - us175-cognito-jwt: []
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:us-east-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-2:234252873463:function:demo-receive-event/invocations"
+        connectionType: "INTERNET"
+  /demo-receive-event-inventory:
+    post:
+      responses:
+        default:
+          description: "Default response for POST /demo-receive-event-inventory"
+      security:
+      - us175-lambda-authorizer-HTTP-API: []
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:us-east-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-2:234252873463:function:demo-receive-event-inventory/invocations"
+        connectionType: "INTERNET"
+  /demo-receive-event-price-archive:
+    post:
+      responses:
+        default:
+          description: "Default response for POST /demo-receive-event-price-archive"
+      security:
+      - us175-cognito-jwt: []
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:us-east-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-2:234252873463:function:demo-receive-event-price-archive/invocations"
+        connectionType: "INTERNET"
+  /demo-update-event-price-archive:
+    post:
+      responses:
+        default:
+          description: "Default response for POST /demo-update-event-price-archive"
+      security:
+      - us175-cognito-jwt: []
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:us-east-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-2:234252873463:function:demo-update-event-price-archive/invocations"
+        connectionType: "INTERNET"
+  /demo-update-inventory:
+    post:
+      responses:
+        default:
+          description: "Default response for POST /demo-update-inventory"
+      security:
+      - us175-lambda-authorizer-HTTP-API: []
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: "aws_proxy"
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:us-east-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-2:234252873463:function:demo-update-event-inventory/invocations"
+        connectionType: "INTERNET"
+components:
+  securitySchemes:
+    us175-cognito-jwt:
+      type: "oauth2"
+      flows: {}
+      x-amazon-apigateway-authorizer:
+        identitySource: "$request.header.Authorization"
+        jwtConfiguration:
+          audience:
+          - "16vg3svrga8ip35dlrq95gk6la"
+          issuer: "https://cognito-idp.us-east-2.amazonaws.com/us-east-2_xrkh6kaWg"
+        type: "jwt"
+    us175-lambda-authorizer-HTTP-API:
+      type: "apiKey"
+      name: "Cookie"
+      in: "header"
+      x-amazon-apigateway-authorizer:
+        identitySource: "$request.header.Cookie"
+        authorizerUri: "arn:aws:apigateway:us-east-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-2:234252873463:function:us175-authorizer-HTTP-API/invocations"
+        authorizerPayloadFormatVersion: "2.0"
+        authorizerResultTtlInSeconds: 300
+        type: "request"
+        enableSimpleResponses: true
+    us175-lambda-authorizer:
+      type: "apiKey"
+      name: "Cookie"
+      in: "header"
+      x-amazon-apigateway-authorizer:
+        identitySource: "$request.header.Cookie"
+        authorizerUri: "arn:aws:apigateway:us-east-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-2:234252873463:function:us175-authorizer/invocations"
+        authorizerPayloadFormatVersion: "2.0"
+        authorizerResultTtlInSeconds: 3600
+        type: "request"
+        enableSimpleResponses: false
+    us175-cognito:
+      type: "oauth2"
+      flows: {}
+      x-amazon-apigateway-authorizer:
+        identitySource: "$request.header.Authorization"
+        jwtConfiguration:
+          audience:
+          - "38s6ieqmen5mf0oi0glnbhigj6"
+          issuer: "https://cognito-idp.us-east-2.amazonaws.com/us-east-2_wxqcedjMm"
+        type: "jwt"
+x-amazon-apigateway-cors:
+  allowMethods:
+  - "GET"
+  - "POST"
+  allowHeaders:
+  - "accept"
+  - "access-control-allow-headers"
+  - "access-control-allow-methods"
+  - "access-control-allow-origin"
+  - "authorization"
+  - "content-type"
+  - "x-amz-date"
+  - "x-amz-security-token"
+  - "x-api-key"
+  - "x-requested-with"
+  maxAge: 0
+  allowCredentials: true
+  allowOrigins:
+  - "https://dev.txn.us175.com"
+  - "https://inv.us175.com"
+  - "https://test.us175.com"
+  - "https://txn.us175.com"
+x-amazon-apigateway-importexport-version: "1.0"
