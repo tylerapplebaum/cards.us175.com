@@ -6,6 +6,7 @@ import urllib.parse
 from jose import jwk, jwt
 from jose.utils import base64url_decode
 import boto3
+import re
 import logging
 from botocore.exceptions import ClientError
 
@@ -23,7 +24,23 @@ def lambda_handler(event, context):
     queryString = request.get("querystring", "")
 
     logger.info(f"requestedUri: {requestedUri}?{queryString}")
-
+    
+    # --- NEW LOGIC: redirect root-level .png files to /Inventory/public/ ---
+    if re.match(r"^/[^/]+\.(png|ico)$", requestedUri, re.IGNORECASE):  # e.g. "/apple-touch-icon.png" or "/favicon.ico"
+        filename = requestedUri.lstrip("/")       # strip leading slash
+        return {
+            "status": "302",
+            "statusDescription": "Found",
+            "headers": {
+                "location": [
+                    {
+                        "key": "location",
+                        "value": f"/Inventory/public/{filename}"
+                    }
+                ]
+            }
+        }
+    
     idToken = ""
 
     # Check cookies for idToken
@@ -38,42 +55,73 @@ def lambda_handler(event, context):
 
     # If no token, redirect to Cognito login
     if not idToken:
-        logger.info("ID Token not found — redirecting to Cognito login")
+        logger.info("ID Token not found – redirecting to Cognito login")
         return create_redirect_to_login_response(
             request, requestedUri, queryString
         )
 
     # Validate JWT header
-    jwtHeaders = jwt.get_unverified_headers(idToken)
-    kid = jwtHeaders["kid"]
+    try:
+        jwtHeaders = jwt.get_unverified_headers(idToken)
+        kid = jwtHeaders["kid"]
+    except Exception as e:
+        logger.error(f"Failed to get JWT headers: {e}")
+        return create_redirect_to_login_response(
+            request, requestedUri, queryString
+        )
 
     key_index = -1
     for i in range(len(KEYS)):
         if kid == KEYS[i]["kid"]:
             key_index = i
             break
+    
     if key_index == -1:
         logger.error("Public key not found in jwks.json")
-        raise Exception("Public key not found in jwks.json")
+        return create_redirect_to_login_response(
+            request, requestedUri, queryString
+        )
 
-    publicKey = jwk.construct(KEYS[key_index])
+    try:
+        publicKey = jwk.construct(KEYS[key_index])
 
-    message, encoded_signature = str(idToken).rsplit(".", 1)
-    decoded_signature = base64url_decode(encoded_signature.encode("utf-8"))
-    if not publicKey.verify(message.encode("utf8"), decoded_signature):
-        raise Exception("Signature verification failed")
+        message, encoded_signature = str(idToken).rsplit(".", 1)
+        decoded_signature = base64url_decode(encoded_signature.encode("utf-8"))
+        
+        if not publicKey.verify(message.encode("utf8"), decoded_signature):
+            logger.error("Signature verification failed")
+            return create_redirect_to_login_response(
+                request, requestedUri, queryString
+            )
 
-    claims = jwt.get_unverified_claims(idToken)
-    if time.time() > claims["exp"]:
-        return create_redirect_to_refresh_response()
+        claims = jwt.get_unverified_claims(idToken)
+        
+        # Check if token is expired
+        if time.time() > claims["exp"]:
+            logger.info("Token expired – redirecting to refresh")
+            # FIXED: Pass the current URI and query string to the refresh function
+            return create_redirect_to_refresh_response(requestedUri, queryString)
 
-    if claims["aud"] != CLIENT_ID:
-        raise Exception("Token was not issued for this audience")
+        if claims["aud"] != CLIENT_ID:
+            logger.error("Token was not issued for this audience")
+            return create_redirect_to_login_response(
+                request, requestedUri, queryString
+            )
+            
+    except Exception as e:
+        logger.error(f"Token validation failed: {e}")
+        return create_redirect_to_login_response(
+            request, requestedUri, queryString
+        )
 
+    # Token is valid, proceed with the request
     return request
 
 
 def create_redirect_to_login_response(request, requestedUri=None, queryString=None):
+    """
+    Create a redirect response to the Cognito login page
+    """
     # Preserve original path + query
     state = requestedUri or "/"
     if queryString:
@@ -90,6 +138,7 @@ def create_redirect_to_login_response(request, requestedUri=None, queryString=No
         f"&state={state}"
     )
     logger.info(f"login_url: {login_url}")
+    
     response = {
         "status": "307",
         "statusDescription": "Temporary Redirect",
@@ -105,7 +154,24 @@ def create_redirect_to_login_response(request, requestedUri=None, queryString=No
     return response
 
 
-def create_redirect_to_refresh_response():
+def create_redirect_to_refresh_response(requestedUri=None, queryString=None):
+    """
+    Create a redirect response to the refresh endpoint
+    FIXED: Now accepts and passes the current URI and query string as state
+    """
+    # Preserve the original path + query in the state parameter
+    state = requestedUri or "/"
+    if queryString:
+        state += f"?{queryString}"
+    
+    # URL encode the state parameter
+    state_encoded = urllib.parse.quote(state, safe="")
+    
+    # Build the refresh URL with the state parameter
+    refresh_url = f"{REFRESH_URL}?state={state_encoded}"
+    
+    logger.info(f"Redirecting to refresh with state: {state}")
+    
     response = {
         "status": "307",
         "statusDescription": "Temporary Redirect",
@@ -113,7 +179,7 @@ def create_redirect_to_refresh_response():
             "location": [
                 {
                     "key": "location",
-                    "value": REFRESH_URL,
+                    "value": refresh_url,
                 },
             ],
         },
@@ -122,6 +188,9 @@ def create_redirect_to_refresh_response():
 
 
 def get_secret():
+    """
+    Retrieve secret from AWS Secrets Manager
+    """
     # Create a Secrets Manager client
     session = boto3.session.Session()
     client = session.client(service_name="secretsmanager", region_name=REGION)
@@ -131,6 +200,7 @@ def get_secret():
             SecretId=os.environ["USER_POOL_SECRET"]
         )
     except ClientError as e:
+        logger.error(f"Failed to retrieve secret: {e}")
         raise e
 
     secret = get_secret_value_response["SecretString"]

@@ -1,64 +1,33 @@
-import json
-import base64
-import requests
-import boto3
-import os
-from botocore.exceptions import ClientError
+import urllib.parse
 
-REGION = "us-east-2"
-# LOAD SSM PARAMETERS
-ssm_client = boto3.client("ssm", region_name=REGION)
-
-param = ssm_client.get_parameter(Name="/prod/serverlessAuth/userPoolHostedUi")
-os.environ["SIGN_IN_URL"] = param["Parameter"]["Value"]
+# Hardcoded for Lambda@Edge
+USER_POOL_DOMAIN = "test-us175.auth.us-east-2.amazoncognito.com"
+CLIENT_ID = "38s6ieqmen5mf0oi0glnbhigj6"
+LOGOUT_REDIRECT = "https://inv.us175.com/landing/"
 
 def lambda_handler(event, context):
-    request = event["Records"][0]["cf"]["request"]
-    headers = request["headers"]
-    domainName = request["headers"]["host"][0]["value"]
+    # Build Cognito logout URL
+    logout_uri = (
+        f"https://{USER_POOL_DOMAIN}/logout"
+        f"?client_id={CLIENT_ID}"
+        f"&logout_uri={urllib.parse.quote(LOGOUT_REDIRECT, safe='')}"
+    )
 
-    idTokenCookie = ""
-    accessTokenCookie = ""
-    refreshTokenCookie = ""
+    # Must match original cookie attributes exactly
+    cookie_attrs = "Path=/; Domain=.us175.com; Secure; HttpOnly; SameSite=None; Max-Age=0"
 
-    # Check for the ID Token cookie
-    for cookie in headers.get("cookie", []):
-        cookiesList = cookie["value"].split(";")
-        for subCookie in cookiesList:
-            if "idToken" in subCookie:
-                idTokenCookie = subCookie
-            if "accessToken" in subCookie:
-                accessTokenCookie = subCookie
-            if "refreshToken" in subCookie:
-                refreshTokenCookie = subCookie
+    expired_cookies = [
+        f"idToken=; {cookie_attrs}",
+        f"accessToken=; {cookie_attrs}",
+        f"refreshToken=; {cookie_attrs}",
+    ]
 
     response = {
         "status": "307",
         "statusDescription": "Temporary Redirect",
         "headers": {
-            "location": [
-                {
-                    "key": "location",
-                    "value": os.environ["SIGN_IN_URL"],
-                },
-            ],
-            "set-cookie": [
-                {
-                    "key": "Set-Cookie",
-                    "value": idTokenCookie,
-                    "attributes": "Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0",
-                },
-                {
-                    "key": "Set-Cookie",
-                    "value": accessTokenCookie,
-                    "attributes": "Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0",
-                },
-                {
-                    "key": "Set-Cookie",
-                    "value": refreshTokenCookie,
-                    "attributes": "Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0",
-                },
-            ],
+            "location": [{"key": "Location", "value": logout_uri}],
+            "set-cookie": [{"key": "Set-Cookie", "value": c} for c in expired_cookies],
         },
     }
 
