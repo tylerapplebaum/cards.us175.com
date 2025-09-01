@@ -4,13 +4,15 @@
   <meta charset="utf-8">
   <title>US175 Price Archive</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <script src="../js/jsrsasign-latest-all-min.js"></script>
-  <script src="../js/verifier.js"></script>
-  <script src="js/userprofile.js"></script>
-  <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="icon" href="favicon.ico" sizes="any">
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name=”apple-mobile-web-app-capable” content="yes">
+  <!-- <script src="../js/jsrsasign-latest-all-min.js"></script> -->
+  <!-- <script src="../js/verifier.js"></script> -->
+  <!-- <script src="js/userprofile.js"></script> -->
+  <link rel="manifest" href="public/manifest.webmanifest">
+  <link rel="icon" href="public/favicon.ico" sizes="any">
+  <link rel="icon" href="public/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="public/apple-touch-icon.png">
   <link rel="stylesheet" type="text/css" href="../vendor/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="../fonts/font-awesome-4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" type="text/css" href="../vendor/animate/animate.css">
@@ -20,14 +22,14 @@
   <link rel="stylesheet" type="text/css" href="css/main.css">
   <style>
 	.update-transition {
-        	transition: all 100ms ease-out;
+    transition: all 100ms ease-out;
 	}
   </style>
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="#">
-      <img src="icon.svg" width="30" height="30" class="d-inline-block align-top" alt="us175-price-archive-icon">
+      <img src="public/icon.svg" width="30" height="30" class="d-inline-block align-top" alt="us175-price-archive-icon">
       US175
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,19 +38,19 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto align-items-center">
         <li class="nav-item active">
-          <a class="nav-link text-nowrap" href="https://dev.txn.us175.com/PriceArchive/">Price Archive <span class="sr-only">(current)</span></a>
+          <a class="nav-link text-nowrap" href="https://test.us175.com/PriceArchive/">Price Archive <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="https://dev.txn.us175.com/Inventory/">Inventory</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="https://dev.txn.us175.com/">Transactions</a>
+          <a class="nav-link" href="https://test.us175.com/Inventory/">Inventory</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="https://gallery.us175.com/">Gallery</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="https://inv.us175.com/wantlist">Wantlist</a>
+          <a class="nav-link" href="https://inv.us175.com/wantlist/">Wantlist</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://inv.us175.com/landing/">Landing</a>
         </li>
         <li class="w-100 mb-3 mb-lg-0">
           <button class="btn btn-outline-success my-2 my-sm-0 w-100" type="button" data-toggle="collapse" data-target="#createFormCollapse" aria-expanded="false" aria-controls="createFormCollapse">Create Archived Price</button>
@@ -257,13 +259,11 @@
         Player: player
       };
       console.log(data)
-      fetch('https://jg46ltuhdl.execute-api.us-east-2.amazonaws.com/demo-query-price-archive', {
+      fetch('https://api.us175.com/demo-query-price-archive', {
         method: 'POST',
-        withCredentials: true,
         credentials: 'include',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': cognitoAccessToken
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
       })
@@ -341,13 +341,11 @@
         Mimetype: window.mimetype
       };
 
-      fetch('https://jg46ltuhdl.execute-api.us-east-2.amazonaws.com/demo-receive-event-price-archive', {
+      fetch('https://api.us175.com/demo-receive-event-price-archive', {
         method: 'POST',
-        withCredentials: true,
         credentials: 'include',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': cognitoAccessToken
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
       })
@@ -413,13 +411,11 @@
       };
       console.log('Update item with ID:', ArchiveId);
       console.log(data);
-      fetch('https://jg46ltuhdl.execute-api.us-east-2.amazonaws.com/demo-update-event-price-archive', {
+      fetch('https://api.us175.com/demo-update-event-price-archive', {
         method: 'POST',
-        withCredentials: true,
         credentials: 'include',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': cognitoAccessToken
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
       })
@@ -464,13 +460,11 @@
         ArchiveId: ArchiveId,
       };
       console.log('Delete item with ID:', ArchiveId);
-      fetch('https://jg46ltuhdl.execute-api.us-east-2.amazonaws.com/demo-delete-event-price-archive', {
+      fetch('https://api.us175.com/demo-delete-event-price-archive', {
         method: 'POST',
-        withCredentials: true,
         credentials: 'include',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': cognitoAccessToken
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
       })
@@ -492,7 +486,7 @@
     } // end deleteItem
 
     function fetchSets() {
-      fetch('https://dev.txn.us175.com/PriceArchive/sets.json', {
+      fetch('https://test.us175.com/PriceArchive/sets.json', {
 		  method: 'GET'
       })
       .then(response => response.json()
@@ -512,7 +506,7 @@
       )
     } // end fetchSets
     function fetchPlayers() {
-      fetch('https://dev.txn.us175.com/PriceArchive/players.json', {
+      fetch('https://test.us175.com/PriceArchive/players.json', {
 		  method: 'GET'
       })
       .then(response => response.json()
