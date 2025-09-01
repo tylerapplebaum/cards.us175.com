@@ -25,8 +25,8 @@ while IFS= read -r id || [[ -n "$id" ]]; do
         --table-name us175-price-archive \
         --key "{\"ArchiveId\": {\"S\": \"$id\"}}" \
         --update-expression "SET Screenshot = :screenshot" \
-        --expression-attribute-values "{\":screenshot\": {\"S\": \"https://dev.txn.us175.com/PriceArchive/pricearchiveimg/$id.png\"}}" \
-        --return-values ALL_NEW
+        --expression-attribute-values "{\":screenshot\": {\"S\": \"https://test.us175.com/PriceArchive/pricearchiveimg/$id.png\"}}" \
+        --return-values UPDATED_NEW
 
     echo "Completed processing for ArchiveId: $id"
     echo "----------------------------------------"
