@@ -5,7 +5,6 @@ import json
 import logging
 import botocore
 from natsort import natsorted
-from decimal import Decimal
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -13,40 +12,9 @@ logger.setLevel(logging.INFO)
 dynamodb = boto3.resource('dynamodb', region_name='us-east-2')
 table = dynamodb.Table(os.environ.get('TableName'))
 
-INDEX_SET_YEAR = os.environ.get('IndexName_SetYear', 'Set-Year-index')
-INDEX_BOX_PLAYER = os.environ.get('IndexName_BoxPlayer', 'BoxNum-PlayerName-index')
-INDEX_PLAYER_SET = os.environ.get('IndexName_PlayerSet', 'PlayerName-Set-index')
-INDEX_MULTIPLAYER = os.environ.get('IndexName_Multiplayer', 'Multiplayer-index')
-
-def convert_sets(obj):
-    """
-    Recursively convert:
-      - set -> list
-      - Decimal -> int (if whole) or float (if fractional)
-    This prepares DynamoDB results for json.dumps().
-    """
-    # dict -> convert each value
-    if isinstance(obj, dict):
-        return {k: convert_sets(v) for k, v in obj.items()}
-
-    # list/tuple -> convert each element (returns list)
-    if isinstance(obj, (list, tuple)):
-        return [convert_sets(i) for i in obj]
-
-    # set -> convert to list (preserve items converted)
-    if isinstance(obj, set):
-        return [convert_sets(i) for i in obj]
-
-    # Decimal -> int or float
-    if isinstance(obj, Decimal):
-        # Decimal.is_integer-like check:
-        if obj == obj.to_integral_value():
-            return int(obj)
-        else:
-            return float(obj)
-
-    # everything else -> return as-is
-    return obj
+INDEX_SET_YEAR = os.environ.get('IndexName_SetYear', 'Set-Year-Index')
+INDEX_BOX_PLAYER = os.environ.get('IndexName_BoxPlayer', 'BoxNum-PlayerName-Index')
+INDEX_PLAYER_SET = os.environ.get('IndexName_PlayerSet', 'PlayerName-Set-Index')
 
 def lambda_handler(event, context):
     logger.info(event['body'])
@@ -61,10 +29,7 @@ def lambda_handler(event, context):
         SortKeyName = 'PlayerName'
         KeyVal = bodyParsed.get('BoxNum', "")
         SortKeyVal = bodyParsed.get('PlayerName', "")
-        if 'G' in KeyVal:
-            LambdaSort = 'PlayerName'
-        else:
-            LambdaSort = 'CardNum'
+        LambdaSort = 'CardNum'
     elif search_type == 'player': # find cards where player is featured
         index = INDEX_PLAYER_SET
         KeyName = 'PlayerName'
@@ -126,44 +91,8 @@ def lambda_handler(event, context):
         itemsListSorted = natsorted(items, key=lambda d: d.get(LambdaSort, ''))
         return itemsListSorted
 
-    def scan_multiplayer(player_name):
-        """Scan the Multiplayer-index for cards containing the given player."""
-        items = []
-        lastEvaluatedKey = None
-        while True:
-            scan_params = {
-                'IndexName': INDEX_MULTIPLAYER,
-                'FilterExpression': Attr('PlayerNames').contains(player_name),
-            }
-            if lastEvaluatedKey:
-                scan_params['ExclusiveStartKey'] = lastEvaluatedKey
-
-            resp = table.scan(**scan_params)
-            items.extend(resp.get('Items', []))
-
-            if 'LastEvaluatedKey' in resp:
-                lastEvaluatedKey = resp['LastEvaluatedKey']
-            else:
-                break
-
-        return items
-
     try:
-        if search_type == 'player':
-            # Query single-player cards using the PlayerName-Set-index
-            ddbitems = ddbquery()
-
-            # Scan for multi-player cards using the new index
-            player_name = bodyParsed.get('PlayerName', "")
-            multiplayer_items = scan_multiplayer(player_name)
-
-            # Merge and sort both sets of results
-            ddbitems.extend(multiplayer_items)
-            ddbitems = natsorted(ddbitems, key=lambda d: d.get(LambdaSort, ''))
-        else:
-            ddbitems = ddbquery()
-
-        ddbitems = convert_sets(ddbitems)
+        ddbitems = ddbquery()
     except botocore.exceptions.ClientError as error:
         raise error
 
@@ -174,3 +103,4 @@ def lambda_handler(event, context):
     }
     
     return responseObject
+

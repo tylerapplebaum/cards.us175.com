@@ -70,14 +70,21 @@
           <label class="custom-control-label" for="customSwitch1"></label>
         </div>
         -->
-        <input class="queryInput form-control mb-2 mr-sm-2" type="text" id="queryYear" name="queryYear" title="Four digit year" pattern="^(20[0-9][0-9])$|(19[0-9][0-9])$" placeholder="2001" aria-required="true">
-        <select class="custom-select form-control mb-2 mr-sm-2 flex-grow-1" id="setSearchList" required aria-required="true">
-          <option selected value="">Select set...</option>
+        <select class="d-none custom-select form-control mb-2 mr-sm-2" id="playerSearchList">
+          <option id="list-player" selected value="">Select player...</option>
+        </select>
+        <select class="d-none custom-select form-control mb-2 mr-sm-2" id="boxSearchList">
+          <option id="list-box" selected value="">Select box...</option>
+        </select>
+        <input class="queryInput form-control mb-2 mr-sm-2" type="text" id="queryYear" name="queryYear" title="Four digit year" pattern="^(20[0-9][0-9])$|(19[0-9][0-9])$" placeholder="2001">
+        <select class="custom-select form-control mb-2 mr-sm-2 flex-grow-1" id="setSearchList">
+          <option id="list-set" selected value="">Select set...</option>
         </select>
         <select class="custom-select form-control mb-2 mr-sm-2 flex-grow-1" id="subsetSearchList">
-          <option selected value="">Select subset...</option>
+          <option id="list-subset" selected value="">Select subset...</option>
         </select>
         <input class="form-control mb-2 mr-sm-2" type="number" id="qty" name="qty" min="0" value="0" title="quantity">
+        <button type="button" onclick="toggleSetPlayerBox()" class="btn btn-outline-dark mb-2 mr-2 flex-grow-1" id="toggleSearchButton">Search: Set</button>
         <button type="submit" class="btn btn-outline-info mb-2 flex-grow-1">Search Inventory</button>
       </form>
     </div>
@@ -190,9 +197,13 @@
                   <label for="modal-Grade">Grade</label>
                   <input type="text" class="form-control" id="modal-Grade" value="" readonly>
                 </div>
-                <div class="form-group col-sm-6 mt-n1">
+                <div class="form-group col-sm-4 mt-n1">
                   <label for="modal-CertNumber">Cert number</label>
                   <input type="text" class="form-control" id="modal-CertNumber" value="" readonly>
+                </div>
+                <div class="form-group col-sm-2 mt-n1">
+                  <label for="modal-BoxNum">Box number</label>
+                  <input type="text" class="form-control" id="modal-BoxNum" value="" readonly>
                 </div>
               </div>
               <div class="form-row mt-n1">
@@ -245,7 +256,7 @@
     </div>
   <!-- End Item Details Modal -->
   <!-- Add Inventory Modal -->
-    <div class="modal fade" id="staticBackdropAddInventory" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropAddInventoryLabel" aria-hidden="true">
+    <div class="modal fade" id="staticBackdropAddInventory" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropAddInventoryLabel" aria-modal="true">
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
@@ -293,12 +304,15 @@
                 <div class="col">
                   <input type="text" id="certNumberInput" placeholder="Cert #" class="form-control mb-2 mr-sm-2">
                 </div>
+                <div class="col">
+                  <input type="text" id="boxNumInput" placeholder="Box #" class="form-control mb-2 mr-sm-2">
+                </div>
               </div>
               <div class="input-group mb-2 mr-sm-2">
                 <div class="input-group-prepend">
                   <span class="input-group-text">
                     <a href="#" onclick="generateUUID()">
-                        <img src="../img/arrow-repeat.svg">
+                        <img src="../img/arrow-repeat.svg" alt="generate new UUID">
                     </a>
                   </span>
                 </div>
@@ -377,6 +391,11 @@
           Results <span class="badge badge-light" id="num-results">0</span>
           <span class="sr-only">number of results returned</span>
         </button>
+        <div id="view-selector" class="btn-group ml-1" role="group" aria-label="Table view selectors">
+          <button type="button" class="btn btn-secondary mb-3">Checklist</button>
+          <button type="button" class="btn btn-info mb-3">Details</button>
+          <button type="button" class="btn btn-success mb-3">Financial</button>
+        </div>
     </div>
   </div>
   <div class="limiter">
@@ -411,10 +430,12 @@
 	let accessToken = localStorage.getItem('accessToken');
   </script>
   <script>
+    let searchtype = "set"
     /*
     function toggleSetPlayer() {
       const setSearch = 'document.getElementById("setSearchList")';
       const playerSearch = 'document.getElementById("playerSearchList")';
+      const boxSearch = 'document.getElementById("boxSearchList")';
       if (!Boolean(document.getElementById("setSearchList").classList.contains('d-none'))) {
         // case: first toggle hit. Add the class d-none first
         document.getElementById("setSearchList").classList.add('d-none');
@@ -428,6 +449,72 @@
 
     }
     */
+    document.addEventListener("DOMContentLoaded", function () {
+      // Ensure initial state when the page loads
+      document.getElementById("setSearchList")?.classList.remove("d-none");
+      document.getElementById("queryYear")?.classList.remove("d-none");
+      document.getElementById("subsetSearchList")?.classList.remove("d-none");
+      document.getElementById("playerSearchList")?.classList.add("d-none");
+      document.getElementById("boxSearchList")?.classList.add("d-none");
+
+      const toggleButton = document.getElementById("toggleSearchButton");
+      if (toggleButton) toggleButton.textContent = "Search: Set";
+    });
+    function toggleSetPlayerBox() {
+      const sections = [
+        { id: "setSearchList", label: "Set" },
+        { id: "playerSearchList", label: "Player" },
+        { id: "boxSearchList", label: "Box" }
+      ];
+
+      const toggleButton = document.getElementById("toggleSearchButton");
+      const queryYear = document.getElementById("queryYear");
+      const subsetSearchList = document.getElementById("subsetSearchList");
+      const qty = document.getElementById("qty");
+
+      // Find which section is currently visible
+      const visibleIndex = sections.findIndex(
+        s => !document.getElementById(s.id).classList.contains("d-none")
+      );
+
+      // Hide all sections
+      sections.forEach(s => document.getElementById(s.id).classList.add("d-none"));
+
+      // Determine the next section to show
+      const nextIndex = (visibleIndex + 1) % sections.length;
+      const nextSection = sections[nextIndex];
+
+      // Show next section
+      document.getElementById(nextSection.id).classList.remove("d-none");
+
+      // Update button text and global search type
+      if (toggleButton) {
+        toggleButton.textContent = `Search: ${nextSection.label}`;
+        searchtype = nextSection.label.toLowerCase();
+        console.log("Search type set to:", searchtype);
+      }
+
+      // Handle Set search grouping
+      if (nextSection.id === "setSearchList") {
+        queryYear?.classList.remove("d-none");
+        subsetSearchList?.classList.remove("d-none");
+      } else {
+        queryYear?.classList.add("d-none");
+        subsetSearchList?.classList.add("d-none");
+      }
+
+      // Reset irrelevant fields when switching search types
+      // (clears stale values from previous search modes)
+      document.getElementById("setSearchList").value = "";
+      document.getElementById("subsetSearchList").value = "";
+      document.getElementById("queryYear").value = "";
+      document.getElementById("boxSearchList").value = "";
+      document.getElementById("playerSearchList").value = "";
+      qty.value = "0";
+
+      console.log("Cleared previous search inputs.");
+    }
+
     function generateUUID() {
       document.getElementById('txnIdInput').value = crypto.randomUUID();
     }
@@ -518,7 +605,7 @@
     });
 
     // Control modal data population. Apparently these are positional parameters; gross.
-    function openModal(guid, Year, Set, Subset, CardNum, PlayerName, Qty, SerialNumber, Authenticator, Grade, CertNumber, TxnId, eBayItemId, PurchasePrice, SalePrice, TxnDate, TxnSource, TxnType, GradingFee) {
+    function openModal(guid, Year, Set, Subset, CardNum, PlayerName, Qty, SerialNumber, Authenticator, Grade, CertNumber, BoxNum, TxnId, eBayItemId, PurchasePrice, SalePrice, TxnDate, TxnSource, TxnType, GradingFee) {
       document.getElementById('modal-guid').value = guid;
       document.getElementById('modal-Year').value = Year;
       document.getElementById('modal-Set').value = Set;
@@ -530,6 +617,7 @@
       document.getElementById('modal-Authenticator').value = Authenticator;
       document.getElementById('modal-Grade').value = Grade;
       document.getElementById('modal-CertNumber').value = CertNumber;
+      document.getElementById('modal-BoxNum').value = BoxNum;
       document.getElementById('modal-TxnId').value = TxnId;
       document.getElementById('modal-eBayItemId').value = eBayItemId;
       document.getElementById('modal-PurchasePrice').value = PurchasePrice;
@@ -562,12 +650,39 @@
       var subset = document.getElementById('subsetSearchList').value;
       var qty = document.getElementById('qty').value;
       var year = document.getElementById('queryYear').value;
+      var boxnum = document.getElementById('boxSearchList').value;
+      var playername = document.getElementById('playerSearchList').value;
+      let data = {};
+      if (set) {
+        data = {
+          Set: set,
+          Year: year,
+          Subset: subset,
+          Qty: qty,
+          SearchType: searchtype
+        };
+      } else if (boxnum) {
+        data = {
+          BoxNum: boxnum,
+          SearchType: searchtype
+        };
+      } else if (playername) {
+        data = {
+          PlayerName: playername,
+          SearchType: searchtype
+        };
+      }
+      /*
       var data = {
         Set: set,
         Year: year,
         Subset: subset,
-        Qty: qty
+        BoxNum: boxnum,
+        PlayerName: playername,
+        Qty: qty,
+        SearchType: searchtype
       };
+      */
       console.log(data)
       fetch('https://api.us175.com/demo-query-inventory', {
         method: 'POST',
@@ -611,6 +726,7 @@
                   '${sanitizeValue(item.Authenticator)}',
                   '${sanitizeValue(item.Grade)}',
                   '${sanitizeValue(item.CertNumber)}',
+                  '${sanitizeValue(item.BoxNum)}',
                   '${sanitizeValue(item.TxnId)}',
                   '${sanitizeValue(item.eBayItemId)}',
                   '${sanitizeValue(item.PurchasePrice)}',
@@ -648,6 +764,7 @@
       const authenticator = document.getElementById('authenticatorInput').value;
       const grade = document.getElementById('gradeInput').value;
       const certnumber = document.getElementById('certNumberInput').value;
+      const boxnum = document.getElementById('boxNumInput').value;
       const txnid = document.getElementById('txnIdInput').value;
       const ebayitemid = document.getElementById('eBayItemIdInput').value;
       const purchaseprice = document.getElementById('purchasePriceInput').value;
@@ -668,6 +785,7 @@
         Authenticator: authenticator,
         Grade: grade,
         CertNumber: certnumber,
+        BoxNum: boxnum,
         TxnId: txnid,
         eBayItemId: ebayitemid,
         PurchasePrice: purchaseprice,
@@ -761,6 +879,7 @@
       const authenticator = document.getElementById('modal-Authenticator').value.replaceAll('<br>','').replaceAll('undefined','');
       const grade = document.getElementById('modal-Grade').value.replaceAll('<br>','').replaceAll('undefined','');
       const certnumber = document.getElementById('modal-CertNumber').value.replaceAll('<br>','').replaceAll('undefined','');
+      const boxnum = document.getElementById('modal-BoxNum').value.replaceAll('<br>','').replaceAll('undefined','');
       const txnid = document.getElementById('modal-TxnId').value.replaceAll('<br>','').replaceAll('undefined','');
       const ebayitemid = document.getElementById('modal-eBayItemId').value.replaceAll('<br>','').replaceAll('undefined','');
       const purchaseprice = document.getElementById('modal-PurchasePrice').value.replaceAll('<br>','').replaceAll('undefined','');
@@ -781,6 +900,7 @@
         Authenticator: authenticator,
         Grade: grade,
         CertNumber: certnumber,
+        BoxNum: boxnum,
         TxnId: txnid,
         eBayItemId: ebayitemid,
         PurchasePrice: purchaseprice,
@@ -907,9 +1027,51 @@
         )
       )
     } // end fetchSubsets
+    function fetchPlayers() {
+      fetch('https://test.us175.com/PriceArchive/players.json', {
+		  method: 'GET'
+      })
+      .then(response => response.json()
+        .then(data => {
+          console.log(data);
+          var list = document.getElementById('playerSearchList');
+          data.Players.forEach(item => {
+            const option = document.createElement('option');
+            //option.value = item;
+            option.innerHTML = `
+              <option value="${item}">${item}</td>
+            `
+            list.appendChild(option);
+          })
+        }
+        )
+      )
+    } // end fetchPlayers
+    function fetchBoxes() {
+      fetch('boxes.json', {
+		  method: 'GET'
+      })
+      .then(response => response.json()
+        .then(data => {
+          console.log(data);
+          var list = document.getElementById('boxSearchList');
+          data.Boxes.forEach(item => {
+            const option = document.createElement('option');
+            //option.value = item;
+            option.innerHTML = `
+              <option value="${item}">${item}</td>
+            `
+            list.appendChild(option);
+          })
+        }
+        )
+      )
+    } // end fetchBoxes
     document.addEventListener("DOMContentLoaded", function () {
       fetchSets();
       fetchSubsets();
+      fetchPlayers();
+      fetchBoxes();
     });
     /*
     function convertImageToBase64() {
@@ -956,6 +1118,153 @@
       });
     }
     convertCSVToBase64();
+  </script>
+  <script>
+    // Track the current view mode
+    let currentView = 'checklist';
+
+    // Helper: rebuild table based on view mode
+    function updateTableView(view) {
+      const itemsTable = document.getElementById('itemsTable');
+      const thead = itemsTable.querySelector('thead tr');
+      const tbody = itemsTable.querySelector('tbody');
+
+      // Reset to base columns
+      thead.innerHTML = `
+        <th scope="col" class="column0" hidden>guid</th>
+        <th scope="col" class="column1">Year</th>
+        <th scope="col" class="column2">Set</th>
+        <th scope="col" class="column3">Subset</th>
+        <th scope="col" class="column4">CardNum</th>
+        <th scope="col" class="column5">Player</th>
+        <th scope="col" class="column6">Qty</th>
+        <th scope="col" class="column7">Action</th>
+      `;
+
+      // Add new columns for Details or Financial view
+      if (view === 'details') {
+        thead.insertAdjacentHTML('beforeend', `
+          <th scope="col" class="column8">Authenticator</th>
+          <th scope="col" class="column9">Grade</th>
+          <th scope="col" class="column10">CertNum</th>
+          <th scope="col" class="column11">BoxNum</th>
+          <th scope="col" class="column12">SerialNumber</th>
+        `);
+      } else if (view === 'financial') {
+        thead.insertAdjacentHTML('beforeend', `
+          <th scope="col" class="column8">Authenticator</th>
+          <th scope="col" class="column9">Grade</th>
+          <th scope="col" class="column10">Purchase Price</th>
+          <th scope="col" class="column11">Grading Fee</th>
+          <th scope="col" class="column12">MktVal</th>
+          <th scope="col" class="column13">Txn Source</th>
+        `);
+      }
+
+      // Rebuild body if data already loaded
+      if (window.lastFetchedData) populateTable(window.lastFetchedData);
+    }
+
+    // Modify fetchItems() to store the data globally
+    const originalFetchItems = fetchItems;
+    fetchItems = function() {
+      originalFetchItems();
+      // Intercept fetch result: modify populateTable
+    };
+
+    // Rebuild the table body based on current view
+    function populateTable(data) {
+      const tbody = document.querySelector('#itemsTable tbody');
+      tbody.innerHTML = '';
+      data.body.forEach((item, index) => {
+        let baseCols = `
+          <td class="column0" hidden>${sanitizeValue(item.guid)}</td>
+          <td class="column1">${sanitizeValue(item.Year)}</td>
+          <td class="column2">${sanitizeValue(item.Set)}</td>
+          <td class="column3">${sanitizeValue(item.Subset)}</td>
+          <td class="column4">${sanitizeValue(item.CardNum)}</td>
+          <td class="column5">${sanitizeValue(item.PlayerName)}</td>
+          <td class="column6">${sanitizeValue(item.Qty)}</td>
+          <td class="column7">
+            <a href="#" class="btn btn-info btn-sm" 
+              onclick="openModal(
+                '${sanitizeValue(item.guid)}',
+                '${sanitizeValue(item.Year)}',
+                '${sanitizeValue(item.Set)}',
+                '${sanitizeValue(item.Subset)}',
+                '${sanitizeValue(item.CardNum)}',
+                '${sanitizeValue(item.PlayerName)}',
+                '${sanitizeValue(item.Qty)}',
+                '${sanitizeValue(item.SerialNumber)}',
+                '${sanitizeValue(item.Authenticator)}',
+                '${sanitizeValue(item.Grade)}',
+                '${sanitizeValue(item.CertNumber)}',
+                '${sanitizeValue(item.BoxNum)}',
+                '${sanitizeValue(item.TxnId)}',
+                '${sanitizeValue(item.eBayItemId)}',
+                '${sanitizeValue(item.PurchasePrice)}',
+                '${sanitizeValue(item.SalePrice)}',
+                '${sanitizeValue(item.TxnDate)}',
+                '${sanitizeValue(item.TxnSource)}',
+                '${sanitizeValue(item.TxnType)}',
+                '${sanitizeValue(item.GradingFee)}'
+              )" data-toggle="modal" data-target="#staticBackdrop">Details</a>
+          </td>
+        `;
+
+        let extraCols = '';
+        if (currentView === 'details') {
+          extraCols = `
+            <td>${sanitizeValue(item.Authenticator)}</td>
+            <td>${sanitizeValue(item.Grade)}</td>
+            <td>${sanitizeValue(item.CertNumber)}</td>
+            <td>${sanitizeValue(item.BoxNum)}</td>
+            <td>${sanitizeValue(item.SerialNumber)}</td>
+          `;
+        } else if (currentView === 'financial') {
+          extraCols = `
+            <td>${sanitizeValue(item.Authenticator)}</td>
+            <td>${sanitizeValue(item.Grade)}</td>
+            <td>${sanitizeValue(item.PurchasePrice)}</td>
+            <td>${sanitizeValue(item.GradingFee)}</td>
+            <td>${sanitizeValue(item.MktVal)}</td>
+            <td>${sanitizeValue(item.TxnSource)}</td>
+          `;
+        }
+
+        const row = document.createElement('tr');
+        row.innerHTML = baseCols + extraCols;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Hook into fetchItems to reuse populateTable
+    const originalFetch = window.fetch;
+    window.fetch = function(...args) {
+      return originalFetch(...args).then(async (response) => {
+        const clone = response.clone();
+        if (args[0].includes('demo-query-inventory')) {
+          const data = await clone.json();
+          window.lastFetchedData = data; // cache result
+          populateTable(data);
+        }
+        return response;
+      });
+    };
+
+    // Wire up the buttons
+    document.querySelector('#view-selector .btn-secondary').addEventListener('click', () => {
+      currentView = 'checklist';
+      updateTableView('checklist');
+    });
+    document.querySelector('#view-selector .btn-info').addEventListener('click', () => {
+      currentView = 'details';
+      updateTableView('details');
+    });
+    document.querySelector('#view-selector .btn-success').addEventListener('click', () => {
+      currentView = 'financial';
+      updateTableView('financial');
+    });
   </script>
   <script>
     function tableToCSV() {

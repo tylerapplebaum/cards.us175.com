@@ -24,6 +24,12 @@ def lambda_handler(event, context):
 
     bodyParsed = json.loads(event['body'])
 
+    def safe_number(value):
+        try:
+            return str(float(value)) if value else '0'
+        except ValueError:
+            return '0'
+
     def ddb_client(tablename):
         ddbresponse = ddbclient.update_item(
             Key={
@@ -41,6 +47,7 @@ def lambda_handler(event, context):
             #itemauthenticator = :itemauthenticator, \
             #itemgrade = :itemgrade, \
             #itemcertnumber = :itemcertnumber, \
+            #itemboxnum = :itemboxnum, \
             #itemtxnid = :itemtxnid, \
             #itemebayitemid = :itemebayitemid, \
             #itempurchaseprice = :itempurchaseprice, \
@@ -60,6 +67,7 @@ def lambda_handler(event, context):
                 '#itemauthenticator': 'Authenticator',
                 '#itemgrade': 'Grade',
                 '#itemcertnumber': 'CertNumber',
+                '#itemboxnum': 'BoxNum',
                 '#itemtxnid': 'TxnId',
                 '#itemebayitemid': 'eBayItemId',
                 '#itempurchaseprice': 'PurchasePrice',
@@ -83,7 +91,7 @@ def lambda_handler(event, context):
                     'S': bodyParsed.get('PlayerName', "")   
                 },
                 ':itemqty':{
-                    'N': bodyParsed.get('Qty', "")
+                    'N': safe_number(bodyParsed.get("Qty"))
                 },
                 ':itemcardnum':{
                     'S': bodyParsed.get('CardNum', "")
@@ -95,10 +103,13 @@ def lambda_handler(event, context):
                     'S': bodyParsed.get('Authenticator', "")
                 },
                 ':itemgrade':{
-                    'S': bodyParsed.get('Grade', "")
+                    'N': safe_number(bodyParsed.get('Grade'))
                 },
                 ':itemcertnumber':{
                     'S': bodyParsed.get('CertNumber', "")
+                },
+                ':itemboxnum':{
+                    'S': bodyParsed.get('BoxNum', "")
                 },
                 ':itemtxnid':{
                     'S': bodyParsed.get('TxnId', "")
@@ -107,10 +118,10 @@ def lambda_handler(event, context):
                     'S': bodyParsed.get('eBayItemId', "")
                 },
                 ':itempurchaseprice':{
-                    'N': bodyParsed.get('PurchasePrice', 0)
+                    'N': safe_number(bodyParsed.get("PurchasePrice"))
                 },
                 ':itemsaleprice':{
-                    'S': bodyParsed.get('SalePrice', "")
+                    'N': safe_number(bodyParsed.get("SalePrice"))
                 },
                 ':itemtxndate':{
                     'S': bodyParsed.get('TxnDate', "")
@@ -122,7 +133,7 @@ def lambda_handler(event, context):
                     'S': bodyParsed.get('TxnType', "")
                 },
                 ':itemgradingfee':{
-                    'S': bodyParsed.get('GradingFee', "")
+                    'N': safe_number(bodyParsed.get("GradingFee"))
                 }
             },
             ReturnValues='UPDATED_NEW',
@@ -133,7 +144,7 @@ def lambda_handler(event, context):
     
     try:    
         ddb_response = ddb_client(tablename)
-        logger.info(ddb_response)
+        # logger.info(ddb_response)
     except botocore.exceptions.ClientError as error:
         # Put your error handling logic here
         raise error
