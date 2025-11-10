@@ -25,8 +25,8 @@ def lambda_handler(event, context):
     cookie_header = headers.get("cookie", "") or headers.get("Cookie", "")
     access_token = _get_cookie(cookie_header, "accessToken")
 
-    logger.info(f"Incoming event: {json.dumps(event)}")
-    logger.info(f"Access token (truncated): {access_token[:20]}..." if access_token else "No access token")
+    #logger.info(f"Incoming event: {json.dumps(event)}")
+    #logger.info(f"Access token (truncated): {access_token[:20]}..." if access_token else "No access token")
 
     if not access_token:
         return {"isAuthorized": False}
