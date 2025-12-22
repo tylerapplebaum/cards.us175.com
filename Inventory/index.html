@@ -9,6 +9,7 @@
   <!-- <script src="../js/jsrsasign-latest-all-min.js"></script> -->
   <!-- <script src="../js/verifier.js"></script> -->
   <!-- <script src="js/userprofile.js"></script> -->
+  <script src="js/exportCSV.js"></script>
   <link rel="manifest" href="public/manifest.webmanifest">
   <link rel="icon" href="public/favicon.ico" sizes="any">
   <link rel="icon" href="public/icon.svg" type="image/svg+xml">
@@ -233,15 +234,15 @@
               <div class="form-row mt-n1">
                 <div class="form-group col-sm-4 mt-n1">
                   <label for="modal-TxnSource">Transaction source</label>
-                  <input type="text" class="form-control" id="modal-TxnSource" value="" readonly>
+                  <input type="text" class="form-control" id="modal-TxnSource" list="TxnSourceList" value="" readonly>
                 </div>
                 <div class="form-group col-sm-4 mt-n1">
                   <label for="modal-TxnType">Transaction type</label>
-                  <input type="text" class="form-control" id="modal-TxnType" value="" readonly>
+                  <input type="text" class="form-control" id="modal-TxnType" list="TxnTypeList" value="" readonly>
                 </div>
                 <div class="form-group col-sm-4 mt-n1">
                   <label for="modal-TxnDate">Transaction date</label>
-                  <input type="text" class="form-control" id="modal-TxnDate" value="" readonly>
+                  <input type="date" class="form-control" id="modal-TxnDate" value="" readonly>
                 </div>
               </div>
               <button type="button" class="btn btn-warning" id="modal-update-button">Update</button>
@@ -318,7 +319,12 @@
                 </div>
                 <input type="text" id="txnIdInput" placeholder="Txn ID" class="form-control">
               </div>
-              <input type="text" id="txnTypeInput" placeholder="Txn Type" value="Purchase" class="form-control mb-2 mr-sm-2">
+              <input type="text" id="txnTypeInput" placeholder="Txn Type" list="TxnTypeList" value="Purchase" class="form-control mb-2 mr-sm-2">
+                <datalist id="TxnTypeList">
+                  <option value="Purchase"></option>
+                  <option value="Trade"></option>
+                  <option value="Pulled"></option>
+                </datalist>
               <div class="form-row">
                 <div class="col">
                   <input type="text" id="txnSourceInput" placeholder="Source" list="TxnSourceList" class="form-control mb-2 mr-sm-2 flex-grow-1">
@@ -386,7 +392,7 @@
           </div>
       </div>
         <input type="text" id="tableFilter" onkeyup="tableFilterFunction()" placeholder="Filter results" class="form-control form-control-lg mb-3" aria-label="Text input with dropdown button">
-        <button type="button" class="btn btn-primary mb-3" onclick="tableToCSV()">
+        <button type="button" class="btn btn-primary mb-3" onclick="exportFullDataToCSV()">
           <span class="badge"><img src="../img/file-earmark-arrow-down.svg" alt="download results"></span>
           Results <span class="badge badge-light" id="num-results">0</span>
           <span class="sr-only">number of results returned</span>
@@ -694,6 +700,7 @@
       })
 	    .then(response => response.json())
         .then(data => {
+          window.exportInventoryData = data.body; // CSV export support
           idnum = 0;
 		      console.log(data)
           const itemsTable = document.getElementById('itemsTable');
