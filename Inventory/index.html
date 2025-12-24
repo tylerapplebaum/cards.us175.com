@@ -515,9 +515,18 @@
       event.preventDefault();
       bulkUpload();
     });
-
+    let activeGuid = null;
+    document.getElementById("detailsForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!activeGuid) {
+        console.warn("No active GUID set");
+        return;
+      }
+      updateItem(activeGuid);
+    });
     // Control modal data population. Apparently these are positional parameters; gross.
     function openModal(guid, Year, Set, Subset, CardNum, PlayerName, Qty, SerialNumber, Authenticator, Grade, CertNumber, BoxNum, TxnId, eBayItemId, PurchasePrice, SalePrice, TxnDate, TxnSource, TxnType, GradingFee) {
+      activeGuid = guid; // prevent event listener accumulation
       document.getElementById('modal-guid').value = guid;
       document.getElementById('modal-Year').value = Year;
       document.getElementById('modal-Set').value = Set;
@@ -544,14 +553,14 @@
       // updateButton.onclick = function() {
       //   updateItem(guid)
       //}
-      document.getElementById("detailsForm").addEventListener("submit", function (e) {
-        e.preventDefault(); // prevent page reload
-        updateItem(guid); // your existing logic
-      });
+      //document.getElementById("detailsForm").addEventListener("submit", function (e) {
+      //  e.preventDefault(); // prevent page reload
+      //  updateItem(guid); // your existing logic
+      //});
       // set up Delete button
       const deleteButton = document.getElementById('modal-delete-button');
       deleteButton.onclick = function() {
-        deleteItem(guid);
+        deleteItem(activeGuid);
         $('#staticBackdrop').modal('hide'); // Close the modal after deletion
       };
     }
