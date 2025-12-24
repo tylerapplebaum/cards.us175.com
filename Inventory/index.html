@@ -85,7 +85,9 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="staticBackdropLabel">Item Details</h5>
-            <a href="javascript:void(0);" onclick="editRowsFunction()"><img class="locked" id="edit-table-rows-icon" src="../img/lock-fill.svg" width="30" height="30" alt="edit-table-rows-icon"></a>
+            <button type="button" class="btn btn-link p-0" onclick="editRowsFunction()" aria-label="Edit fields">
+              <img class="locked" id="edit-table-rows-icon" src="../img/lock-fill.svg" width="30" height="30" alt="edit-table-rows-icon">
+            </button>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -188,7 +190,7 @@
                   <input type="date" class="form-control" id="modal-TxnDate" value="" readonly>
                 </div>
               </div>
-              <button type="button" class="btn btn-warning" id="modal-update-button">Update</button>
+              <button type="submit" class="btn btn-warning" id="modal-update-button">Update</button>
             </form>
           </div>
           <div class="modal-footer">
@@ -538,10 +540,14 @@
       document.getElementById('modal-GradingFee').value = GradingFee;
       // You can add more code here to fetch and display other item details
       // set up Update button
-      const updateButton = document.getElementById('modal-update-button');
-      updateButton.onclick = function() {
-        updateItem(guid)
-      }
+      // const updateButton = document.getElementById('modal-update-button');
+      // updateButton.onclick = function() {
+      //   updateItem(guid)
+      //}
+      document.getElementById("detailsForm").addEventListener("submit", function (e) {
+        e.preventDefault(); // prevent page reload
+        updateItem(guid); // your existing logic
+      });
       // set up Delete button
       const deleteButton = document.getElementById('modal-delete-button');
       deleteButton.onclick = function() {
@@ -755,6 +761,15 @@
       .catch(error => console.error('Error:', error));
     } // end bulkUpload
 
+    function sanitize(value) {
+      if (value == null) return '';
+
+      return String(value)
+        .replace(/\s+/g, ' ')   // collapse tabs/newlines to single space
+        .trim()                 // remove leading/trailing whitespace
+        .replace(/^undefined$/i, '');
+    }
+
     // Update an existing item
     function updateItem(guid) {
       var rows = document.getElementsByClassName("column0");
@@ -767,48 +782,34 @@
       }
       const updaterow = document.getElementById(rowId);
       // If Enter is accidentally pressed, <br> is added & must be sanitized
-      const Guid = document.getElementById('modal-guid').value
-      const year = document.getElementById('modal-Year').value.replaceAll('<br>','').replaceAll('undefined','');
-      const set = document.getElementById('modal-Set').value.replaceAll('<br>','').replaceAll('undefined','');
-      const subset = document.getElementById('modal-Subset').value.replaceAll('<br>','').replaceAll('undefined','');
-      const cardnum = document.getElementById('modal-CardNum').value.replaceAll('<br>','').replaceAll('undefined','');
-      const player = document.getElementById('modal-PlayerName').value.replaceAll('<br>','').replaceAll('undefined','');
-      const qty = document.getElementById('modal-Qty').value.replaceAll('<br>','').replaceAll('undefined','');
-      const serialnumber = document.getElementById('modal-SerialNumber').value.replaceAll('<br>','').replaceAll('undefined','');
-      const authenticator = document.getElementById('modal-Authenticator').value.replaceAll('<br>','').replaceAll('undefined','');
-      const grade = document.getElementById('modal-Grade').value.replaceAll('<br>','').replaceAll('undefined','');
-      const certnumber = document.getElementById('modal-CertNumber').value.replaceAll('<br>','').replaceAll('undefined','');
-      const boxnum = document.getElementById('modal-BoxNum').value.replaceAll('<br>','').replaceAll('undefined','');
-      const txnid = document.getElementById('modal-TxnId').value.replaceAll('<br>','').replaceAll('undefined','');
-      const ebayitemid = document.getElementById('modal-eBayItemId').value.replaceAll('<br>','').replaceAll('undefined','');
-      const purchaseprice = document.getElementById('modal-PurchasePrice').value.replaceAll('<br>','').replaceAll('undefined','');
-      const saleprice = document.getElementById('modal-SalePrice').value.replaceAll('<br>','').replaceAll('undefined','');
-      const txndate = document.getElementById('modal-TxnDate').value.replaceAll('<br>','').replaceAll('undefined','');
-      const txnsource = document.getElementById('modal-TxnSource').value.replaceAll('<br>','').replaceAll('undefined','');
-      const txntype = document.getElementById('modal-TxnType').value.replaceAll('<br>','').replaceAll('undefined','');
-      const gradingfee = document.getElementById('modal-GradingFee').value.replaceAll('<br>','').replaceAll('undefined','');
-      const data = {
-        guid: Guid,
-        Year: year,
-        Set: set,
-        Subset: subset,
-        CardNum: cardnum,
-        PlayerName: player,
-        Qty: qty,
-        SerialNumber: serialnumber,
-        Authenticator: authenticator,
-        Grade: grade,
-        CertNumber: certnumber,
-        BoxNum: boxnum,
-        TxnId: txnid,
-        eBayItemId: ebayitemid,
-        PurchasePrice: purchaseprice,
-        SalePrice: saleprice,
-        TxnDate: txndate,
-        TxnSource: txnsource,
-        TxnType: txntype,
-        GradingFee: gradingfee
+      const fields = {
+        guid: 'modal-guid',
+        Year: 'modal-Year',
+        Set: 'modal-Set',
+        Subset: 'modal-Subset',
+        CardNum: 'modal-CardNum',
+        PlayerName: 'modal-PlayerName',
+        Qty: 'modal-Qty',
+        SerialNumber: 'modal-SerialNumber',
+        Authenticator: 'modal-Authenticator',
+        Grade: 'modal-Grade',
+        CertNumber: 'modal-CertNumber',
+        BoxNum: 'modal-BoxNum',
+        TxnId: 'modal-TxnId',
+        eBayItemId: 'modal-eBayItemId',
+        PurchasePrice: 'modal-PurchasePrice',
+        SalePrice: 'modal-SalePrice',
+        TxnDate: 'modal-TxnDate',
+        TxnSource: 'modal-TxnSource',
+        TxnType: 'modal-TxnType',
+        GradingFee: 'modal-GradingFee'
       };
+      const data = Object.fromEntries(
+        Object.entries(fields).map(([key, id]) => {
+          const el = document.getElementById(id);
+          return [key, sanitize(el?.value)];
+        })
+      );
       console.log('Update item with ID:', guid);
       console.log(data);
       fetch('https://api.us175.com/demo-update-inventory', {
