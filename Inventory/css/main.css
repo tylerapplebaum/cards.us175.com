@@ -183,6 +183,11 @@ table thead tr {
   background: #36304a;
 }
 
+table tfoot tr {
+  height: 60px;
+  background: #36304a;
+}
+
 table tbody tr {
   height: 40px;
 }
@@ -214,6 +219,14 @@ table th.r {
 .table100-head th {
   font-family: CervoNeue-Regular;
   font-size: 18px;
+  color: #fff;
+  line-height: 1.2;
+  font-weight: unset;
+}
+
+.table100-foot th {
+  font-family: CervoNeue-Regular;
+  font-size: 15px;
   color: #fff;
   line-height: 1.2;
   font-weight: unset;

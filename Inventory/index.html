@@ -367,6 +367,9 @@
       </tr>
     </thead>
     <tbody></tbody>
+    <tfoot>
+      <tr class="table100-foot"></tr>
+    </tfoot>
   </table>
   </div>
   </div>
@@ -1009,10 +1012,21 @@
     // Track the current view mode
     let currentView = 'checklist';
 
+    // ---- utilities ----
+    function formatMoney(value) {
+      const n = parseFloat(value);
+      return isNaN(n)
+        ? ''
+        : n.toLocaleString(undefined, {
+            style: 'currency',
+            currency: 'USD'
+          });
+    }
     // Helper: rebuild table based on view mode
     function updateTableView(view) {
       const itemsTable = document.getElementById('itemsTable');
       const thead = itemsTable.querySelector('thead tr');
+      const tfoot = itemsTable.querySelector('tfoot tr');
       const tbody = itemsTable.querySelector('tbody');
 
       // Reset to base columns
@@ -1061,7 +1075,12 @@
     // Rebuild the table body based on current view
     function populateTable(data) {
       const tbody = document.querySelector('#itemsTable tbody');
+      const tfoot = document.querySelector('tfoot');
       tbody.innerHTML = '';
+      tfoot.innerHTML = ''; // reset footer
+      let mktValTotal = 0;
+      let gradingFeeTotal = 0;
+      let purchPriceTotal = 0;
       data.body.forEach((item, index) => {
         let baseCols = `
           <td class="column0" hidden>${sanitizeValue(item.guid)}</td>
@@ -1108,6 +1127,18 @@
             <td>${sanitizeValue(item.SerialNumber)}</td>
           `;
         } else if (currentView === 'financial') {
+          const mktVal = parseFloat(item.MktVal);
+          if (!isNaN(mktVal)) {
+            mktValTotal += mktVal;
+          }
+          const purchPrice = parseFloat(item.PurchasePrice);
+          if (!isNaN(purchPrice)) {
+            purchPriceTotal += purchPrice;
+          }
+          const gradeFee = parseFloat(item.GradingFee);
+          if (!isNaN(gradeFee)) {
+            gradingFeeTotal += gradeFee;
+          }
           extraCols = `
             <td>${sanitizeValue(item.Authenticator)}</td>
             <td>${sanitizeValue(item.Grade)}</td>
@@ -1122,6 +1153,20 @@
         row.innerHTML = baseCols + extraCols;
         tbody.appendChild(row);
       });
+
+       // ---- FOOTER (financial view only) ----
+        if (currentView === 'financial') {
+          const footerRow = document.createElement('tr');
+          footerRow.classList.add('table100-foot');
+          footerRow.innerHTML = `
+            <th colspan="9"></th>
+            <th title="Purchase price total">${formatMoney(purchPriceTotal)}</th>
+            <th title="Grading fee total">${formatMoney(gradingFeeTotal)}</th>
+            <th title="Market value total">${formatMoney(mktValTotal)}</th>
+            <th colspan="1"></th>
+          `;
+          tfoot.appendChild(footerRow);
+        }
     }
 
     // Hook into fetchItems to reuse populateTable
