@@ -241,8 +241,8 @@
                   <input type="text" class="form-control" id="modal-PurchasePrice" pattern="(?:^[1-9]([0-9]+)?(?:\.[0-9]{1,2})?$)|(?:^(?:0)$)|(?:^[0-9]\.[0-9](?:[0-9])?$)" value="" readonly>
                 </div>
                 <div class="form-group col-sm-4 mt-n1">
-                  <label for="modal-SalePrice">Sale price</label>
-                  <input type="text" class="form-control" id="modal-SalePrice" pattern="(?:^[1-9]([0-9]+)?(?:\.[0-9]{1,2})?$)|(?:^(?:0)$)|(?:^[0-9]\.[0-9](?:[0-9])?$)" value="" readonly>
+                  <label for="modal-MktVal">Market Value</label>
+                  <input type="text" class="form-control" id="modal-MktVal" pattern="(?:^[1-9]([0-9]+)?(?:\.[0-9]{1,2})?$)|(?:^(?:0)$)|(?:^[0-9]\.[0-9](?:[0-9])?$)" value="" readonly>
                 </div>
                 <div class="form-group col-sm-4 mt-n1">
                   <label for="modal-GradingFee">Grading fee</label>
@@ -261,6 +261,19 @@
                 <div class="form-group col-sm-4 mt-n1">
                   <label for="modal-TxnDate">Transaction date</label>
                   <input type="date" class="form-control" id="modal-TxnDate" value="" readonly>
+                </div>
+              </div>
+              <div class="form-row mt-n1">
+                <button type="button" class="btn btn-link p-0" data-toggle="collapse" data-target="#modalSalesCollapse" aria-expanded="false" aria-controls="expand-sales-data">
+                  <img src="public/plus.svg" width="20" height="20" alt="expand-sales-data">
+                  <span class="label label-default">Sales Data</span>
+                </button>
+              </div>
+              <hr class="mt-2 mb-3">
+              <div class="form-row mt-n1 collapse" id="modalSalesCollapse">
+                <div class="form-group col-sm-4 mt-n1">
+                  <label for="modal-SalePrice">Sale price</label>
+                  <input type="text" class="form-control" id="modal-SalePrice" pattern="(?:^[1-9]([0-9]+)?(?:\.[0-9]{1,2})?$)|(?:^(?:0)$)|(?:^[0-9]\.[0-9](?:[0-9])?$)" value="" readonly>
                 </div>
               </div>
               <button type="submit" class="btn btn-warning" id="modal-update-button">Update</button>
@@ -362,6 +375,9 @@
               <div class="form-row">
                 <div class="col">
                   <input type="number" id="purchasePriceInput" step=".01" placeholder="Purchase Price" class="form-control mb-2 mr-sm-2">
+                </div>
+                <div class="col">
+                  <input type="number" id="mktValInput" step=".01" placeholder="Market Value" class="form-control mb-2 mr-sm-2">
                 </div>
                 <div class="col">
                   <input type="date" id="txnDate" value="" class="form-control mb-2 mr-sm-2">
@@ -602,7 +618,7 @@
       updateItem(activeGuid);
     });
     // Control modal data population. Apparently these are positional parameters; gross.
-    function openModal(guid, Year, Set, Subset, CardNum, PlayerName, Qty, SerialNumber, Authenticator, Grade, CertNumber, BoxNum, TxnId, eBayItemId, PurchasePrice, SalePrice, TxnDate, TxnSource, TxnType, GradingFee) {
+    function openModal(guid, Year, Set, Subset, CardNum, PlayerName, Qty, SerialNumber, Authenticator, Grade, CertNumber, BoxNum, TxnId, eBayItemId, PurchasePrice, SalePrice, TxnDate, TxnSource, TxnType, GradingFee, MktVal) {
       activeGuid = guid; // prevent event listener accumulation
       document.getElementById('modal-guid').value = guid;
       document.getElementById('modal-Year').value = Year;
@@ -624,6 +640,7 @@
       document.getElementById('modal-TxnSource').value = TxnSource;
       document.getElementById('modal-TxnType').value = TxnType;
       document.getElementById('modal-GradingFee').value = GradingFee;
+      document.getElementById('modal-MktVal').value = MktVal;
       // You can add more code here to fetch and display other item details
       // set up Update button
       // const updateButton = document.getElementById('modal-update-button');
@@ -726,7 +743,8 @@
                   '${sanitizeValue(item.TxnDate)}',
                   '${sanitizeValue(item.TxnSource)}',
                   '${sanitizeValue(item.TxnType)}',
-                  '${sanitizeValue(item.GradingFee)}'
+                  '${sanitizeValue(item.GradingFee)}',
+                  '${sanitizeValue(item.MktVal)}'
                   )" data-toggle="modal" data-target="#staticBackdrop">Details
                 </a>
               </td>
@@ -764,7 +782,7 @@
       const txnsource = document.getElementById('txnSourceInput').value;
       const txntype = document.getElementById('txnTypeInput').value;
       const gradingfee = document.getElementById('gradingFeeInput').value;
-      
+      const mktval = document.getElementById('mktValInput').value;
       const data = {
         Year: year,
         Set: set,
@@ -784,7 +802,8 @@
         TxnDate: txndate,
         TxnSource: txnsource,
         TxnType: txntype,
-        GradingFee: gradingfee
+        GradingFee: gradingfee,
+        MktVal: mktval
       };
 
       fetch('https://api.us175.com/demo-receive-event-inventory', {
@@ -867,7 +886,6 @@
         }
       }
       const updaterow = document.getElementById(rowId);
-      // If Enter is accidentally pressed, <br> is added & must be sanitized
       const fields = {
         guid: 'modal-guid',
         Year: 'modal-Year',
@@ -888,7 +906,8 @@
         TxnDate: 'modal-TxnDate',
         TxnSource: 'modal-TxnSource',
         TxnType: 'modal-TxnType',
-        GradingFee: 'modal-GradingFee'
+        GradingFee: 'modal-GradingFee',
+        MktVal: 'modal-MktVal'
       };
       const data = Object.fromEntries(
         Object.entries(fields).map(([key, id]) => {
@@ -1186,7 +1205,8 @@
                 '${sanitizeValue(item.TxnDate)}',
                 '${sanitizeValue(item.TxnSource)}',
                 '${sanitizeValue(item.TxnType)}',
-                '${sanitizeValue(item.GradingFee)}'
+                '${sanitizeValue(item.GradingFee)}',
+                '${sanitizeValue(item.MktVal)}'
               )" data-toggle="modal" data-target="#staticBackdrop">Details</a>
           </td>
         `;
