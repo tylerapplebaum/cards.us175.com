@@ -50,6 +50,11 @@ p {
   margin: 5px;
 }
 
+.p-modal {
+  margin: 2px;
+  font-size: small;
+}
+
 ul,
 li {
   margin: 0;

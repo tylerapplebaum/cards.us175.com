@@ -59,6 +59,9 @@
       </ul>
       <!-- Form for searching existing transactions -->
       <form id="existingForm" class="form-inline">
+        <button type="button" href="#" class="btn btn-outline*" data-toggle="modal" data-target="#staticBackdropBoxInfo">
+          <img src="public/info.svg" width="20" height="20" class="d-inline-block align-top" alt="box-title-info" title="Box details">
+        </button>
         <select class="d-none custom-select form-control mb-2 mr-sm-2" id="playerSearchList">
           <option id="list-player" selected value="">Select player...</option>
         </select>
@@ -78,7 +81,68 @@
       </form>
     </div>
   </nav>
-
+  <!-- Box Details Modal-->
+   <div class="modal fade" id="staticBackdropBoxInfo" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropBoxInfoLabel" aria-modal="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropBoxInfoLabel">Box Details</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p class="p-modal">C - At/en-route from COMC</p>
+            <p class="p-modal">E - At/en-route from eBay</p>
+            <p class="p-modal">S - At/en-route from Sportlots</p>
+            <p class="p-modal">T1 - Trade</p>
+            <hr class="mt-2 mb-3">
+            <p class="p-modal">G1 - Graded cards, 2000s - prior</p>
+            <p class="p-modal">G2 - Graded cards, 2010s - now</p>
+            <hr class="mt-2 mb-3">
+            <p class="p-modal">H1 - 2001 Topps Heritage Base, Inserts, Autos, Relics</p>
+            <p class="p-modal">H2 - 2001 Topps Heritage Chrome, 2010 Topps Heritage Black Refractors</p>
+            <p class="p-modal">H3 - 2002 Topps Heritage</p>
+            <p class="p-modal">H4 - 2003 Topps Heritage</p>
+            <p class="p-modal">H5 - 2004 Topps Heritage Base, Inserts, Autos, Relics</p>
+            <p class="p-modal">H6 - 2004 Topps Heritage Chrome, Refractors, Black Refractors</p>
+            <p class="p-modal">H7 - 2005 Topps Heritage Base, Inserts, Autos, Relics</p>
+            <p class="p-modal">H8 - 2005 Topps Heritage Chrome, Refractors, Black Refractors</p>
+            <p class="p-modal">H9 - 2006 Topps Heritage Base, Inserts, Autos, Relics, Chrome</p>
+            <p class="p-modal">H10 - 2006 Topps Heritage Refractors, Black Refractors</p>
+            <p class="p-modal">H11 - 2007 Topps Heritage Base, Inserts, Autos, Relics</p>
+            <p class="p-modal">H12 - 2007 Topps Heritage Chrome, Refractors, Black Refractors</p>
+            <p class="p-modal">H13 - 2008 Topps Heritage + High Number Base, Inserts, Autos, Relics</p>
+            <p class="p-modal">H14 - 2008 Topps Heritage Chrome</p>
+            <p class="p-modal">H15 - 2008 Topps Heritage Black Refractors, 2011 Topps Heritage Black Refractors</p>
+            <p class="p-modal">H16 - 2009 Topps Heritage + High Number Base, Inserts, Autos, Relics, Black Refractors</p>
+            <p class="p-modal">H17 - 2009 Topps Heritage Chrome, Refractors</p>
+            <p class="p-modal">H18 - 2008 Topps Heritage Chrome</p>
+            <p class="p-modal">H19 - 2010 Topps Heritage Base, Inserts, Autos, Relics</p>
+            <p class="p-modal">H20 - 2010 Topps Heritage Chrome, Refractors</p>
+            <p class="p-modal">H21 - 2011 Topps Heritage Base, Inserts, Autos, Black Border</p>
+            <p class="p-modal">H22 - 2011 Topps Heritage Blue, Green, Red Tints</p>
+            <p class="p-modal">H23 - 2011 Topps Heritage Refractors, Relics</p>
+            <p class="p-modal">H24 - 2011 Topps Heritage Chrome, Green Refractors</p>
+            <p class="p-modal">H25 - 2012 Topps Heritage Base, Inserts, Autos, Relics</p>
+            <p class="p-modal">H26 - 2012 Topps Heritage Chrome, Refractors, Black Refractors, 63 Mint, JFK</p>
+            <p class="p-modal">H27 - 2024 Topps Heritage Mini</p>
+            <hr class="mt-2 mb-3">
+            <p class="p-modal">U1 - 2000 Upper Deck Yankees Legends, 2001 Upper Deck Pinstripe Exclusives</p>
+            <p class="p-modal">U2 - 2001 Upper Deck Vintage</p>
+            <p class="p-modal">U3 - 2001 Upper Deck Legends of New York Base, Inserts, Bat, Bat Auto</p>
+            <p class="p-modal">U4 - 2001 Upper Deck Legends of New York Jersey, Jersey Gold</p>
+            <p class="p-modal">U5 - 2001 Upper Deck Legends of New York Combo Autos, Game Base, Stadium Seat</p>
+            <hr class="mt-2 mb-3">
+            <p class="p-modal">A1 - 2010 Topps Allen and Ginter Base, Inserts</p>
+            <p class="p-modal">A2 - 2010 Topps Allen and Ginter Mini Regular Back</p>
+            <p class="p-modal">A3 - 2010 Topps Allen and Ginter Mini Ginter Back</p>
+            <p class="p-modal">A4 - 2010 Topps Allen and Ginter Mini Black Border</p>
+            <p class="p-modal">A5 - 2010 Topps Allen and Ginter Mini Bazooka Back, NNO, EXT, Rip</p>
+          </div>
+      </div>
+    </div>
+  </div>
   <!-- Item Details Modal -->
     <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel">
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -103,7 +167,7 @@
               <div class="form-row mt-n1">
                 <div class="form-group col-sm-4 mt-n1">
                   <label for="modal-Year">Year</label>
-                  <input type="text" class="form-control" id="modal-Year" value="" readonly>
+                  <input type="text" class="form-control" id="modal-Year" pattern="^[\d]{4}$" value="" readonly>
                 </div>
                 <div class="form-group col-sm-8 mt-n1">
                   <label for="modal-Set">Set</label>
@@ -127,7 +191,7 @@
                 </div>
                 <div class="form-group col-sm-2 mt-n1">
                   <label for="modal-Qty">Qty</label>
-                  <input type="text" class="form-control" id="modal-Qty" value="" readonly>
+                  <input type="text" class="form-control" id="modal-Qty" pattern="^[\d]{1,2}$" value="" readonly>
                 </div>
                 <div class="form-group col-sm-4 mt-n1">
                   <label for="modal-SerialNumber">Serial number</label>
@@ -137,7 +201,7 @@
               <div class="form-row mt-n1">
                 <div class="form-group col-sm-4 mt-n1">
                   <label for="modal-Authenticator">Authenticator</label>
-                  <input type="text" class="form-control" id="modal-Authenticator" value="" readonly>
+                  <input type="text" class="form-control" id="modal-Authenticator" pattern="(?:^PSA$)|(?:BGS$)|(?:SGC$)|(?:CGC$)" value="" readonly>
                 </div>
                 <div class="form-group col-sm-2 mt-n1">
                   <label for="modal-Grade">Grade</label>
@@ -149,31 +213,40 @@
                 </div>
                 <div class="form-group col-sm-2 mt-n1">
                   <label for="modal-BoxNum">Box number</label>
-                  <input type="text" class="form-control" id="modal-BoxNum" value="" readonly>
+                  <input type="text" class="form-control" id="modal-BoxNum" value="" required readonly>
                 </div>
               </div>
               <div class="form-row mt-n1">
                 <div class="form-group col-sm-8 mt-n1">
                   <label for="modal-TxnId">Transaction ID</label>
+                  <div class="input-group">
+                  	<div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <a href="#" onclick="generateUUID('modal-TxnId'); return false;">
+                            <img src="../img/arrow-repeat.svg" alt="generate new UUID">
+                        </a>
+                      </span>
+                    </div>
                   <input type="text" class="form-control" id="modal-TxnId" value="" readonly>
+                  </div>
                 </div>
                 <div class="form-group col-sm-4 mt-n1">
                   <label for="modal-eBayItemId">eBay item</label>
-                  <input type="text" class="form-control" id="modal-eBayItemId" value="" readonly>
+                  <input type="text" class="form-control" id="modal-eBayItemId" value="" pattern="[\d]{12}" readonly>
                 </div>
               </div>
               <div class="form-row mt-n1">
                 <div class="form-group col-sm-4 mt-n1">
                   <label for="modal-PurchasePrice">Purchase price</label>
-                  <input type="text" class="form-control" id="modal-PurchasePrice" value="" readonly>
+                  <input type="text" class="form-control" id="modal-PurchasePrice" pattern="(?:^[1-9]([0-9]+)?(?:\.[0-9]{1,2})?$)|(?:^(?:0)$)|(?:^[0-9]\.[0-9](?:[0-9])?$)" value="" readonly>
                 </div>
                 <div class="form-group col-sm-4 mt-n1">
                   <label for="modal-SalePrice">Sale price</label>
-                  <input type="text" class="form-control" id="modal-SalePrice" value="" readonly>
+                  <input type="text" class="form-control" id="modal-SalePrice" pattern="(?:^[1-9]([0-9]+)?(?:\.[0-9]{1,2})?$)|(?:^(?:0)$)|(?:^[0-9]\.[0-9](?:[0-9])?$)" value="" readonly>
                 </div>
                 <div class="form-group col-sm-4 mt-n1">
                   <label for="modal-GradingFee">Grading fee</label>
-                  <input type="text" class="form-control" id="modal-GradingFee" value="" readonly>
+                  <input type="text" class="form-control" id="modal-GradingFee" pattern="(?:^[1-9]([0-9]+)?(?:\.[0-9]{1,2})?$)|(?:^(?:0)$)|(?:^[0-9]\.[0-9](?:[0-9])?$)" value="" readonly>
                 </div>
               </div>
               <div class="form-row mt-n1">
@@ -251,13 +324,13 @@
                   <input type="text" id="certNumberInput" placeholder="Cert #" class="form-control mb-2 mr-sm-2">
                 </div>
                 <div class="col">
-                  <input type="text" id="boxNumInput" placeholder="Box #" class="form-control mb-2 mr-sm-2">
+                  <input type="text" id="boxNumInput" placeholder="Box #" class="form-control mb-2 mr-sm-2" required>
                 </div>
               </div>
               <div class="input-group mb-2 mr-sm-2">
                 <div class="input-group-prepend">
                   <span class="input-group-text">
-                    <a href="#" onclick="generateUUID()">
+                    <a href="#" onclick="generateUUID('txnIdInput'); return false;">
                         <img src="../img/arrow-repeat.svg" alt="generate new UUID">
                     </a>
                   </span>
@@ -447,9 +520,10 @@
       console.log("Cleared previous search inputs.");
     }
 
-    function generateUUID() {
-      document.getElementById('txnIdInput').value = crypto.randomUUID();
+    function generateUUID(inputId) {
+      document.getElementById(inputId).value = crypto.randomUUID();
     }
+
     function tableFilterFunction() {
       // https://www.w3schools.com/howto/howto_js_filter_table.asp
       // https://stackoverflow.com/a/1085810
@@ -734,7 +808,7 @@
             // reset button to normal status after 2 seconds
             document.getElementById("add-archived").classList.remove('btn-success');
             document.getElementById("add-archived").classList.add('btn-primary');
-            document.getElementById("add-archived").innerHTML = 'Add Archived Price';
+            document.getElementById("add-archived").innerHTML = 'Add Inventory';
             // document.getElementById("add-archived-spin").classList.add('invisible');
           }, 2000);
         } else {
