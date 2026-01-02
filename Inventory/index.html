@@ -7,6 +7,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
   <script src="js/exportCSV.js"></script>
+  <script src="js/lookups.js" defer></script>
+  <script src="js/importCSV.js" defer></script>
   <link rel="manifest" href="public/manifest.webmanifest">
   <link rel="icon" href="public/favicon.ico" sizes="any">
   <link rel="icon" href="public/icon.svg" type="image/svg+xml">
@@ -336,14 +338,15 @@
               </form>
           </div>
           <div class="modal-footer">
-            <form id="bulkForm" class="form-inline">
+            <div class="form-inline">
               <input type="file" class="form-control-custom mr-sm-2" id="csvInput" accept=".csv">
-              <button id="bulk-add" type="submit" class="btn btn-primary">
+              <small id="csvMeta" class="mr-2 text-muted"></small>
+              <button id="bulk-add" type="button" class="btn btn-primary" onclick="bulkUpload()" disabled>
                 <span class="badge"><img src="../img/file-earmark-arrow-up.svg" alt="bulk upload"></span>
                 Bulk
                 <span class="sr-only">bulk upload inventory</span>
               </button>
-            </form>
+            </div>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div>
@@ -351,7 +354,7 @@
     </div>
   <!-- End Add Inventory Modal -->
   <!-- Box Details Modal-->
-    <div id="boxInfoModalMount"></div>
+  <div id="boxInfoModalMount"></div>
   <div class="container-fluid">
     <div class="input-group">
       <div class="input-group-prepend">
@@ -410,6 +413,11 @@
   <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
   <script src="../vendor/select2/select2.min.js"></script>
   <script src="../js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      loadLookups();
+    });
+  </script>
   <script>
     let searchtype = "set"
     document.addEventListener("DOMContentLoaded", function () {
@@ -541,10 +549,6 @@
       createItem();
     });
 
-    document.getElementById('bulkForm').addEventListener('submit', function(event) {
-      event.preventDefault();
-      bulkUpload();
-    });
     let activeGuid = null;
     document.getElementById("detailsForm").addEventListener("submit", function (e) {
       e.preventDefault();
@@ -655,117 +659,111 @@
           populateTable(data); // the ONLY place rows are built now
         })
         .catch(error => console.error('Error:', error));
-        //document.getElementById('setSearchList').value = ''; // clear it out
-        //document.getElementById('subsetSearchList').value = '';
+    }
+    // Add Inventory button helper
+    function setCreateButtonState(state) {
+      const btn = document.getElementById("add-archived");
+      if (!btn) return;
+
+      // remove prior spinner if any
+      btn.querySelector('#add-archived-spin')?.remove();
+
+      if (state === "loading") {
+        btn.classList.remove('btn-success', 'btn-danger');
+        btn.classList.add('btn-primary');
+        btn.innerHTML = 'Loading...';
+        btn.insertAdjacentHTML(
+          "afterbegin",
+          '<span id="add-archived-spin" class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> '
+        );
+        btn.disabled = true;
+        return;
+      }
+
+      btn.disabled = false;
+
+      if (state === "success") {
+        btn.innerHTML = 'Success';
+        btn.classList.remove('btn-primary', 'btn-danger');
+        btn.classList.add('btn-success');
+        return;
+      }
+
+      if (state === "error") {
+        btn.innerHTML = 'Error';
+        btn.classList.remove('btn-primary', 'btn-success');
+        btn.classList.add('btn-danger');
+        return;
+      }
+
+      // default / reset
+      btn.classList.remove('btn-success', 'btn-danger');
+      btn.classList.add('btn-primary');
+      btn.innerHTML = 'Add Inventory';
     }
 
-    // Create a new item
     function createItem() {
-      document.getElementById("add-archived").innerHTML = 'Loading...';
-      const element = '<span id="add-archived-spin" class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>';
-      document.getElementById("add-archived").insertAdjacentHTML("afterbegin",element);
-      const year = document.getElementById('yearInput').value;
-      const set = document.getElementById('setInput').value;
-      const subset = document.getElementById('subsetInput').value;
-      const cardnum = document.getElementById('cardNumInput').value;
-      const player = document.getElementById('playerInput').value;
-      const qty = document.getElementById('qtyInput').value;
-      const serialnumber = document.getElementById('serialNumberInput').value;
-      const authenticator = document.getElementById('authenticatorInput').value;
-      const grade = document.getElementById('gradeInput').value;
-      const certnumber = document.getElementById('certNumberInput').value;
-      const boxnum = document.getElementById('boxNumInput').value;
-      const txnid = document.getElementById('txnIdInput').value;
-      const ebayitemid = document.getElementById('eBayItemIdInput').value;
-      const purchaseprice = document.getElementById('purchasePriceInput').value;
-      const saleprice = document.getElementById('salePriceInput').value;
-      const txndate = document.getElementById('txnDate').value;
-      const txnsource = document.getElementById('txnSourceInput').value;
-      const txntype = document.getElementById('txnTypeInput').value;
-      const gradingfee = document.getElementById('gradingFeeInput').value;
-      const mktval = document.getElementById('mktValInput').value;
-      const data = {
-        Year: year,
-        Set: set,
-        Subset: subset,
-        CardNum: cardnum,
-        PlayerName: player,
-        Qty: qty,
-        SerialNumber: serialnumber,
-        Authenticator: authenticator,
-        Grade: grade,
-        CertNumber: certnumber,
-        BoxNum: boxnum,
-        TxnId: txnid,
-        eBayItemId: ebayitemid,
-        PurchasePrice: purchaseprice,
-        SalePrice: saleprice,
-        TxnDate: txndate,
-        TxnSource: txnsource,
-        TxnType: txntype,
-        GradingFee: gradingfee,
-        MktVal: mktval
+      setCreateButtonState("loading");
+
+      // Map payload keys -> input IDs
+      const fields = {
+        Year: 'yearInput',
+        Set: 'setInput',
+        Subset: 'subsetInput',
+        CardNum: 'cardNumInput',
+        PlayerName: 'playerInput',
+        Qty: 'qtyInput',
+        SerialNumber: 'serialNumberInput',
+        Authenticator: 'authenticatorInput',
+        Grade: 'gradeInput',
+        CertNumber: 'certNumberInput',
+        BoxNum: 'boxNumInput',
+        TxnId: 'txnIdInput',
+        eBayItemId: 'eBayItemIdInput',
+        PurchasePrice: 'purchasePriceInput',
+        MktVal: 'mktValInput',
+        SalePrice: 'salePriceInput',
+        TxnDate: 'txnDate',
+        TxnSource: 'txnSourceInput',
+        TxnType: 'txnTypeInput',
+        GradingFee: 'gradingFeeInput'
       };
+
+      const payload = Object.fromEntries(
+        Object.entries(fields).map(([key, id]) => {
+          const el = document.getElementById(id);
+          return [key, sanitize(el?.value)];
+        })
+      );
 
       fetch('https://api.us175.com/demo-receive-event-inventory', {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Item created:', data);
-        // fetchItems(); // Refresh the table
-        statusCode = data.StatusCode;
-        if (statusCode =='200') {
-          document.getElementById("add-archived").innerHTML = 'Success';
-          document.getElementById("add-archived").classList.remove('btn-primary');
-          document.getElementById("add-archived").classList.add('btn-success');
-          setTimeout(function() {
-            // reset button to normal status after 2 seconds
-            document.getElementById("add-archived").classList.remove('btn-success');
-            document.getElementById("add-archived").classList.add('btn-primary');
-            document.getElementById("add-archived").innerHTML = 'Add Inventory';
-            // document.getElementById("add-archived-spin").classList.add('invisible');
-          }, 2000);
-        } else {
-          document.getElementById("add-archived").innerHTML = 'Error';
-          document.getElementById("add-archived").classList.remove('btn-primary');
-          document.getElementById("add-archived").classList.add('btn-danger');
-        };
-        document.getElementById('createForm').reset(); // Reset the form
-      })
-      .catch(error => console.error('Error:', error));
-    } // end createItem
+        .then(r => r.json())
+        .then(res => {
+          const statusCode = res.StatusCode;
 
-    // Bulk upload inventory
-    function bulkUpload() {
-      const data = {
-        CSVFile: window.b64CSV
-      };
-      fetch('https://api.us175.com/demo-bulk-upload-inventory', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Bulk data added', data);
-        statusCode = data.StatusCode;
-        if (statusCode =='200') {
-          console.log('Bulk load success')
-        } else {
-          console.log('Bulk load error')
-        };
-      })
-      .catch(error => console.error('Error:', error));
-    } // end bulkUpload
+          if (statusCode == '200') {
+            setCreateButtonState("success");
+
+            // reset button back to normal after 2 seconds
+            setTimeout(() => setCreateButtonState("reset"), 2000);
+
+            document.getElementById('createForm')?.reset();
+            // optional: fetchItems(); // refresh table
+          } else {
+            setCreateButtonState("error");
+            console.log('Create failed:', statusCode, res);
+          }
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          setCreateButtonState("error");
+        });
+    }
 
     function sanitize(value) {
       if (value == null) return '';
@@ -898,115 +896,6 @@
       })
       .catch(error => console.error('Error:', error));
     } // end deleteItem
-
-    function fetchSets() {
-      fetch('sets.json', {
-		  method: 'GET'
-      })
-      .then(response => response.json()
-        .then(data => {
-          console.log(data);
-          var list = document.getElementById('setSearchList');
-          data.Sets.forEach(item => {
-            const option = document.createElement('option');
-            //option.value = item;
-            option.innerHTML = `
-              <option value="${item}">${item}</td>
-            `
-            list.appendChild(option);
-          })
-        }
-        )
-      )
-    } // end fetchSets
-    function fetchSubsets() {
-      fetch('subsets.json', {
-		  method: 'GET'
-      })
-      .then(response => response.json()
-        .then(data => {
-          console.log(data);
-          var list = document.getElementById('subsetSearchList');
-          data.Subsets.forEach(item => {
-            const option = document.createElement('option');
-            //option.value = item;
-            option.innerHTML = `
-              <option value="${item}">${item}</td>
-            `
-            list.appendChild(option);
-          })
-        }
-        )
-      )
-    } // end fetchSubsets
-    function fetchPlayers() {
-      fetch('https://test.us175.com/PriceArchive/players.json', {
-		  method: 'GET'
-      })
-      .then(response => response.json()
-        .then(data => {
-          console.log(data);
-          var list = document.getElementById('playerSearchList');
-          data.Players.forEach(item => {
-            const option = document.createElement('option');
-            //option.value = item;
-            option.innerHTML = `
-              <option value="${item}">${item}</td>
-            `
-            list.appendChild(option);
-          })
-        }
-        )
-      )
-    } // end fetchPlayers
-    function fetchBoxes() {
-      fetch('boxes.json', {
-		  method: 'GET'
-      })
-      .then(response => response.json()
-        .then(data => {
-          console.log(data);
-          var list = document.getElementById('boxSearchList');
-          data.Boxes.forEach(item => {
-            const option = document.createElement('option');
-            //option.value = item;
-            option.innerHTML = `
-              <option value="${item}">${item}</td>
-            `
-            list.appendChild(option);
-          })
-        }
-        )
-      )
-    } // end fetchBoxes
-    document.addEventListener("DOMContentLoaded", function () {
-      fetchSets();
-      fetchSubsets();
-      fetchPlayers();
-      fetchBoxes();
-    });
-
-    function convertCSVToBase64() {
-      // https://stackoverflow.com/a/65926546
-      // Cg== is a newline character that is inadvertently added; no harm.
-      const fileSelector = document.getElementById('csvInput');
-      fileSelector.addEventListener('change', (event) => {
-        const fileList = event.target.files[0];
-        console.log(fileList);
-        // encode the file using the FileReader API
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64String = reader.result
-          //window.mimetype = base64String.match(/image\/\w+/)[0]
-          //console.log(window.mimetype)
-          window.b64CSV = base64String
-            .replace('data:text/csv;base64,','');
-          console.log(window.b64CSV);
-        };
-        reader.readAsDataURL(fileList);
-      });
-    }
-    convertCSVToBase64();
   </script>
   <script>
     // Track the current view mode
