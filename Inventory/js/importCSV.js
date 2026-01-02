@@ -199,3 +199,28 @@ window.bulkUpload = function bulkUpload() {
       }
     });
 };
+
+(function resetImportCSVOnModalClose() {
+  const modalId = 'staticBackdropAddInventory';
+  // If jQuery/Bootstrap 4 is present, hook into the modal lifecycle
+  if (typeof window.$ === 'function') {
+    $('#' + modalId).on('hidden.bs.modal', function () {
+      // reset global + UI state
+      window.b64CSV = null;
+
+      const fileInput = document.getElementById('csvInput');
+      if (fileInput) fileInput.value = '';
+
+      const csvMeta = document.getElementById('csvMeta');
+      if (csvMeta) csvMeta.textContent = '';
+
+      const uploadBtn = document.getElementById('bulk-add');
+      if (uploadBtn) {
+        uploadBtn.disabled = true;
+        uploadBtn.title = '';
+      }
+    });
+  } else {
+    console.warn('jQuery not found; modal reset hook not installed.');
+  }
+})();
