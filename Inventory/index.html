@@ -81,68 +81,7 @@
       </form>
     </div>
   </nav>
-  <!-- Box Details Modal-->
-   <div class="modal fade" id="staticBackdropBoxInfo" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropBoxInfoLabel" aria-modal="true">
-      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropBoxInfoLabel">Box Details</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p class="p-modal">C - At/en-route from COMC</p>
-            <p class="p-modal">E - At/en-route from eBay</p>
-            <p class="p-modal">S - At/en-route from Sportlots</p>
-            <p class="p-modal">T1 - Trade</p>
-            <hr class="mt-2 mb-3">
-            <p class="p-modal">G1 - Graded cards, 2000s - prior</p>
-            <p class="p-modal">G2 - Graded cards, 2010s - now</p>
-            <hr class="mt-2 mb-3">
-            <p class="p-modal">H1 - 2001 Topps Heritage Base, Inserts, Autos, Relics</p>
-            <p class="p-modal">H2 - 2001 Topps Heritage Chrome, 2010 Topps Heritage Black Refractors</p>
-            <p class="p-modal">H3 - 2002 Topps Heritage</p>
-            <p class="p-modal">H4 - 2003 Topps Heritage</p>
-            <p class="p-modal">H5 - 2004 Topps Heritage Base, Inserts, Autos, Relics</p>
-            <p class="p-modal">H6 - 2004 Topps Heritage Chrome, Refractors, Black Refractors</p>
-            <p class="p-modal">H7 - 2005 Topps Heritage Base, Inserts, Autos, Relics</p>
-            <p class="p-modal">H8 - 2005 Topps Heritage Chrome, Refractors, Black Refractors</p>
-            <p class="p-modal">H9 - 2006 Topps Heritage Base, Inserts, Autos, Relics, Chrome</p>
-            <p class="p-modal">H10 - 2006 Topps Heritage Refractors, Black Refractors</p>
-            <p class="p-modal">H11 - 2007 Topps Heritage Base, Inserts, Autos, Relics</p>
-            <p class="p-modal">H12 - 2007 Topps Heritage Chrome, Refractors, Black Refractors</p>
-            <p class="p-modal">H13 - 2008 Topps Heritage + High Number Base, Inserts, Autos, Relics</p>
-            <p class="p-modal">H14 - 2008 Topps Heritage Chrome</p>
-            <p class="p-modal">H15 - 2008 Topps Heritage Black Refractors, 2011 Topps Heritage Black Refractors</p>
-            <p class="p-modal">H16 - 2009 Topps Heritage + High Number Base, Inserts, Autos, Relics, Black Refractors</p>
-            <p class="p-modal">H17 - 2009 Topps Heritage Chrome, Refractors</p>
-            <p class="p-modal">H18 - 2008 Topps Heritage Chrome</p>
-            <p class="p-modal">H19 - 2010 Topps Heritage Base, Inserts, Autos, Relics</p>
-            <p class="p-modal">H20 - 2010 Topps Heritage Chrome, Refractors</p>
-            <p class="p-modal">H21 - 2011 Topps Heritage Base, Inserts, Autos, Black Border</p>
-            <p class="p-modal">H22 - 2011 Topps Heritage Blue, Green, Red Tints</p>
-            <p class="p-modal">H23 - 2011 Topps Heritage Refractors, Relics</p>
-            <p class="p-modal">H24 - 2011 Topps Heritage Chrome, Green Refractors</p>
-            <p class="p-modal">H25 - 2012 Topps Heritage Base, Inserts, Autos, Relics</p>
-            <p class="p-modal">H26 - 2012 Topps Heritage Chrome, Refractors, Black Refractors, 63 Mint, JFK</p>
-            <p class="p-modal">H27 - 2024 Topps Heritage Mini</p>
-            <hr class="mt-2 mb-3">
-            <p class="p-modal">U1 - 2000 Upper Deck Yankees Legends, 2001 Upper Deck Pinstripe Exclusives</p>
-            <p class="p-modal">U2 - 2001 Upper Deck Vintage</p>
-            <p class="p-modal">U3 - 2001 Upper Deck Legends of New York Base, Inserts, Bat, Bat Auto</p>
-            <p class="p-modal">U4 - 2001 Upper Deck Legends of New York Jersey, Jersey Gold</p>
-            <p class="p-modal">U5 - 2001 Upper Deck Legends of New York Combo Autos, Game Base, Stadium Seat</p>
-            <hr class="mt-2 mb-3">
-            <p class="p-modal">A1 - 2010 Topps Allen and Ginter Base, Inserts</p>
-            <p class="p-modal">A2 - 2010 Topps Allen and Ginter Mini Regular Back</p>
-            <p class="p-modal">A3 - 2010 Topps Allen and Ginter Mini Ginter Back</p>
-            <p class="p-modal">A4 - 2010 Topps Allen and Ginter Mini Black Border</p>
-            <p class="p-modal">A5 - 2010 Topps Allen and Ginter Mini Bazooka Back, NNO, EXT, Rip</p>
-          </div>
-      </div>
-    </div>
-  </div>
+
   <!-- Item Details Modal -->
     <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel">
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -328,7 +267,7 @@
               </div>
               <div class="form-row">
                 <div class="col">
-                  <input type="text" id="authenticatorInput" placeholder="Authenticator" class="form-control mb-2 mr-sm-2">
+                  <input type="text" id="authenticatorInput" placeholder="Authenticator" pattern="(?:^PSA$)|(?:BGS$)|(?:SGC$)|(?:CGC$)" class="form-control mb-2 mr-sm-2">
                 </div>
                 <div class="col">
                   <input type="number" id="gradeInput" placeholder="Grade" class="form-control mb-2 mr-sm-2 flex-grow-1">
@@ -369,7 +308,7 @@
                   </datalist>
                 </div>
                 <div class="col">
-                  <input type="text" id="eBayItemIdInput" placeholder="eBay Item Id" class="form-control mb-2 mr-sm-2">
+                  <input type="text" id="eBayItemIdInput" placeholder="eBay Item Id" pattern="[\d]{12}" class="form-control mb-2 mr-sm-2">
                 </div>
               </div>
               <div class="form-row">
@@ -411,6 +350,8 @@
       </div>
     </div>
   <!-- End Add Inventory Modal -->
+  <!-- Box Details Modal-->
+    <div id="boxInfoModalMount"></div>
   <div class="container-fluid">
     <div class="input-group">
       <div class="input-group-prepend">
@@ -574,16 +515,12 @@
       const container = document.querySelector("#detailsForm");
       if (editicon.classList.value == 'locked') {
         // case: default on page load
-        //document.querySelectorAll("td[contenteditable='false']").forEach(elem => elem.setAttribute("contenteditable", "true"));
-        //container.querySelectorAll("input[readonly]").forEach(elem => elem.removeAttribute("readonly"));
         container.querySelectorAll("input").forEach(elem => elem.readOnly = false);
         editicon.src = '../img/unlock-fill.svg'
         editicon.classList.value = 'unlocked'
         console.log("Rows unlocked for editing")
       } else {
         // locking after an unlock
-        //document.querySelectorAll("td[contenteditable='true']").forEach(elem => elem.setAttribute("contenteditable", "false"));
-        //container.querySelectorAll("input").forEach(elem => elem.setAttribute("readonly", true));
         container.querySelectorAll("input").forEach(elem => elem.readOnly = true);
         editicon.src = '../img/lock-fill.svg'
         editicon.classList.value = 'locked'
@@ -617,52 +554,60 @@
       }
       updateItem(activeGuid);
     });
-    // Control modal data population. Apparently these are positional parameters; gross.
-    function openModal(guid, Year, Set, Subset, CardNum, PlayerName, Qty, SerialNumber, Authenticator, Grade, CertNumber, BoxNum, TxnId, eBayItemId, PurchasePrice, SalePrice, TxnDate, TxnSource, TxnType, GradingFee, MktVal) {
-      activeGuid = guid; // prevent event listener accumulation
-      document.getElementById('modal-guid').value = guid;
-      document.getElementById('modal-Year').value = Year;
-      document.getElementById('modal-Set').value = Set;
-      document.getElementById('modal-Subset').value = Subset;
-      document.getElementById('modal-CardNum').value = CardNum;
-      document.getElementById('modal-PlayerName').value = PlayerName;
-      document.getElementById('modal-Qty').value = Qty;
-      document.getElementById('modal-SerialNumber').value = SerialNumber;
-      document.getElementById('modal-Authenticator').value = Authenticator;
-      document.getElementById('modal-Grade').value = Grade;
-      document.getElementById('modal-CertNumber').value = CertNumber;
-      document.getElementById('modal-BoxNum').value = BoxNum;
-      document.getElementById('modal-TxnId').value = TxnId;
-      document.getElementById('modal-eBayItemId').value = eBayItemId;
-      document.getElementById('modal-PurchasePrice').value = PurchasePrice;
-      document.getElementById('modal-SalePrice').value = SalePrice;
-      document.getElementById('modal-TxnDate').value = TxnDate;
-      document.getElementById('modal-TxnSource').value = TxnSource;
-      document.getElementById('modal-TxnType').value = TxnType;
-      document.getElementById('modal-GradingFee').value = GradingFee;
-      document.getElementById('modal-MktVal').value = MktVal;
-      // You can add more code here to fetch and display other item details
-      // set up Update button
-      // const updateButton = document.getElementById('modal-update-button');
-      // updateButton.onclick = function() {
-      //   updateItem(guid)
-      //}
-      //document.getElementById("detailsForm").addEventListener("submit", function (e) {
-      //  e.preventDefault(); // prevent page reload
-      //  updateItem(guid); // your existing logic
-      //});
-      // set up Delete button
+
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('.details-btn');
+      if (!btn) return;
+
+      const index = btn.dataset.index;
+      openModal(window.exportInventoryData[index]);
+    });
+    const modalFieldMap = {
+      guid: 'modal-guid',
+      Year: 'modal-Year',
+      Set: 'modal-Set',
+      Subset: 'modal-Subset',
+      CardNum: 'modal-CardNum',
+      PlayerName: 'modal-PlayerName',
+      Qty: 'modal-Qty',
+      SerialNumber: 'modal-SerialNumber',
+      Authenticator: 'modal-Authenticator',
+      Grade: 'modal-Grade',
+      CertNumber: 'modal-CertNumber',
+      BoxNum: 'modal-BoxNum',
+      TxnId: 'modal-TxnId',
+      eBayItemId: 'modal-eBayItemId',
+      PurchasePrice: 'modal-PurchasePrice',
+      SalePrice: 'modal-SalePrice',
+      TxnDate: 'modal-TxnDate',
+      TxnSource: 'modal-TxnSource',
+      TxnType: 'modal-TxnType',
+      GradingFee: 'modal-GradingFee',
+      MktVal: 'modal-MktVal'
+    };
+    function openModal(item) {
+      activeGuid = item.guid;
+
+      Object.entries(modalFieldMap).forEach(([key, elementId]) => {
+        const el = document.getElementById(elementId);
+        if (el) {
+          el.value = sanitizeValue(item[key]);
+        }
+      });
+
       const deleteButton = document.getElementById('modal-delete-button');
-      deleteButton.onclick = function() {
+      deleteButton.onclick = () => {
         deleteItem(activeGuid);
-        $('#staticBackdrop').modal('hide'); // Close the modal after deletion
+        $('#staticBackdrop').modal('hide');
       };
     }
 
     // Fetch existing items and populate the table    
     function sanitizeValue(value) {
-        //return value === 'undefined' ? null : value;
-        return value === 'undefined' || value === undefined ? '' : value;
+      if (value === undefined || value === null || value === 'undefined') {
+        return '';
+      }
+      return String(value).trim();
     }
     function fetchItems() {
       var set = document.getElementById('setSearchList').value;
@@ -702,56 +647,12 @@
       })
 	    .then(response => response.json())
         .then(data => {
-          window.exportInventoryData = data.body; // CSV export support
-          idnum = 0;
-		      console.log(data)
-          const itemsTable = document.getElementById('itemsTable');
-          const tbody = itemsTable.getElementsByTagName('tbody')[0];
-          document.getElementById('num-results').innerHTML = data.body.length;
-          tbody.innerHTML = '';
-          data.body.forEach(item => {
-            // console.log(item)
-            const row = document.createElement('tr');
-		        row.classList.add("update-transition")
-            row.id = 'row' + idnum; // uniquely identify each row for update/delete actions
-            row.innerHTML = `
-              <td class="column0" hidden>${sanitizeValue(item.guid)}</td>
-              <td class="column1 mb-2 mb-lg-4" contenteditable="false">${sanitizeValue(item.Year)}</td>
-              <td class="column2 mb-2 mb-lg-4" contenteditable="false">${sanitizeValue(item.Set)}</td>
-              <td class="column3 mb-2 mb-lg-4" contenteditable="false">${sanitizeValue(item.Subset) || '<br>'}</td>
-              <td class="column4 mb-2 mb-lg-4" contenteditable="false">${sanitizeValue(item.CardNum)}</td>
-              <td class="column5 mb-2 mb-lg-4" contenteditable="false">${sanitizeValue(item.PlayerName)}</td>
-              <td class="column6 mb-2 mb-lg-4" contenteditable="false">${sanitizeValue(item.Qty)}</td>
-              <td class="column11 p-3 mt-3 d-flex flex-column d-lg-block mt-lg-0 p-lg-2">
-                <a href="#" class="btn btn-info btn-sm" onclick="openModal(
-                  '${sanitizeValue(item.guid)}',
-                  '${sanitizeValue(item.Year)}',
-                  '${sanitizeValue(item.Set)}',
-                  '${sanitizeValue(item.Subset)}',
-                  '${sanitizeValue(item.CardNum)}',
-                  '${sanitizeValue(item.PlayerName)}',
-                  '${sanitizeValue(item.Qty)}',
-                  '${sanitizeValue(item.SerialNumber)}',
-                  '${sanitizeValue(item.Authenticator)}',
-                  '${sanitizeValue(item.Grade)}',
-                  '${sanitizeValue(item.CertNumber)}',
-                  '${sanitizeValue(item.BoxNum)}',
-                  '${sanitizeValue(item.TxnId)}',
-                  '${sanitizeValue(item.eBayItemId)}',
-                  '${sanitizeValue(item.PurchasePrice)}',
-                  '${sanitizeValue(item.SalePrice)}',
-                  '${sanitizeValue(item.TxnDate)}',
-                  '${sanitizeValue(item.TxnSource)}',
-                  '${sanitizeValue(item.TxnType)}',
-                  '${sanitizeValue(item.GradingFee)}',
-                  '${sanitizeValue(item.MktVal)}'
-                  )" data-toggle="modal" data-target="#staticBackdrop">Details
-                </a>
-              </td>
-            `;
-            tbody.appendChild(row);
-            ++idnum;
-          });
+          window.exportInventoryData = data.body;  // CSV + modal click uses this
+          window.lastFetchedData = data;           // view switching uses this
+
+          document.getElementById('num-results').textContent = data.body.length;
+
+          populateTable(data); // the ONLY place rows are built now
         })
         .catch(error => console.error('Error:', error));
         //document.getElementById('setSearchList').value = ''; // clear it out
@@ -877,15 +778,20 @@
 
     // Update an existing item
     function updateItem(guid) {
-      var rows = document.getElementsByClassName("column0");
-      // find the row that the guid belongs to so that we can set the background color
+      const rows = document.getElementsByClassName("column0");
+      // find the <tr> that contains this guid cell
+      let updaterow = null;
       for (let z = 0; z < rows.length; z++) {
-        if (rows[z].innerHTML == guid) {
-            rowId = rows[z].parentElement.id
-            break;
+        if (rows[z].textContent.trim() === String(guid).trim()) {
+          updaterow = rows[z].closest('tr');
+          break;
         }
       }
-      const updaterow = document.getElementById(rowId);
+
+      if (!updaterow) {
+        console.warn('Could not find table row for guid:', guid);
+        return;
+      }
       const fields = {
         guid: 'modal-guid',
         Year: 'modal-Year',
@@ -928,25 +834,21 @@
       .then(response => response.json())
       .then(data => {
         console.log('Item updated:', data);
-        // fetchItems(); // Refresh the table
         statusCode = data.StatusCode;
         if (statusCode == '200') {
           editRowsFunction() // re-lock fields
           updaterow.style.backgroundColor = "#28a745";
-          //updaterow.style.background = "linear-gradient(to top, lime, 20%, cyan)";
           setTimeout(() => {
             updaterow.style.background = "";
           }, 750);
-          console.log('Updated rowId:' + rowId + ' HTTP status: ' + statusCode);
-          //document.getElementById(rowId).outerHTML = '';
+          console.log('Updated guid:' + guid + ' HTTP status: ' + statusCode);
+          fetchItems(); // Refresh the table
         } else {
 		      updaterow.style.backgroundColor = "#dc3545";
-          //updaterow.style.background = "linear-gradient(to top, coral, 20%, crimson)"
 		      setTimeout(() => {
             updaterow.style.backgroundColor = "";
           }, 750);
-          //document.getElementById(rowId).innerHTML = 'Error';
-          console.log('Error updating' + rowId + ' HTTP error: ' + statusCode)
+          console.log('Error updating' + guid + ' HTTP error: ' + statusCode)
         };
       })
       .catch(error => console.error('Error:', error));
@@ -954,14 +856,19 @@
 
     // Delete an item
     function deleteItem(guid) {
-      // Implement the delete logic based on your API endpoint
-      var rows = document.getElementsByClassName("column0");
-      // find the row that the guid belongs to so that we can delete from the DOM after success
+      const rows = document.getElementsByClassName("column0");
+      // find the <tr> that contains this guid cell
+      let deleterow = null;
       for (let z = 0; z < rows.length; z++) {
-        if (rows[z].innerHTML == guid) {
-            rowId = rows[z].parentElement.id
-            break;
+        if (rows[z].textContent.trim() === String(guid).trim()) {
+          deleterow = rows[z].closest('tr');
+          break;
         }
+      }
+
+      if (!deleterow) {
+        console.warn('Could not find table row for guid:', guid);
+        return;
       }
       const data = {
         guid: guid,
@@ -978,14 +885,14 @@
       .then(response => response.json())
       .then(data => {
         console.log('Item deleted:', data);
-        // fetchItems(); // Refresh the table
         statusCode = data.StatusCode;
         if (statusCode == '200') {
-          console.log('Deleting rowId:' + rowId);
-          document.getElementById(rowId).outerHTML = '';
+          console.log('Deleting guid:' + guid);
+          deleterow.style.backgroundColor = "#dc3545";
+          setTimeout(() => deleterow.remove(), 200);
           console.log(statusCode)
+          fetchItems(); // Refresh the table
         } else {
-          //document.getElementById(rowId).innerHTML = 'Error';
           console.log(statusCode)
         };
       })
@@ -1158,13 +1065,6 @@
       if (window.lastFetchedData) populateTable(window.lastFetchedData);
     }
 
-    // Modify fetchItems() to store the data globally
-    const originalFetchItems = fetchItems;
-    fetchItems = function() {
-      originalFetchItems();
-      // Intercept fetch result: modify populateTable
-    };
-
     // Rebuild the table body based on current view
     function populateTable(data) {
       const tbody = document.querySelector('#itemsTable tbody');
@@ -1184,30 +1084,13 @@
           <td class="column5">${sanitizeValue(item.PlayerName)}</td>
           <td class="column6">${sanitizeValue(item.Qty)}</td>
           <td class="column7">
-            <a href="#" class="btn btn-info btn-sm" 
-              onclick="openModal(
-                '${sanitizeValue(item.guid)}',
-                '${sanitizeValue(item.Year)}',
-                '${sanitizeValue(item.Set)}',
-                '${sanitizeValue(item.Subset)}',
-                '${sanitizeValue(item.CardNum)}',
-                '${sanitizeValue(item.PlayerName)}',
-                '${sanitizeValue(item.Qty)}',
-                '${sanitizeValue(item.SerialNumber)}',
-                '${sanitizeValue(item.Authenticator)}',
-                '${sanitizeValue(item.Grade)}',
-                '${sanitizeValue(item.CertNumber)}',
-                '${sanitizeValue(item.BoxNum)}',
-                '${sanitizeValue(item.TxnId)}',
-                '${sanitizeValue(item.eBayItemId)}',
-                '${sanitizeValue(item.PurchasePrice)}',
-                '${sanitizeValue(item.SalePrice)}',
-                '${sanitizeValue(item.TxnDate)}',
-                '${sanitizeValue(item.TxnSource)}',
-                '${sanitizeValue(item.TxnType)}',
-                '${sanitizeValue(item.GradingFee)}',
-                '${sanitizeValue(item.MktVal)}'
-              )" data-toggle="modal" data-target="#staticBackdrop">Details</a>
+            <a href="#"
+              class="btn btn-info btn-sm details-btn"
+              data-index="${index}"
+              data-toggle="modal"
+              data-target="#staticBackdrop">
+              Details
+            </a>
           </td>
         `;
 
@@ -1262,21 +1145,6 @@
           tfoot.appendChild(footerRow);
         }
     }
-
-    // Hook into fetchItems to reuse populateTable
-    const originalFetch = window.fetch;
-    window.fetch = function(...args) {
-      return originalFetch(...args).then(async (response) => {
-        const clone = response.clone();
-        if (args[0].includes('demo-query-inventory')) {
-          const data = await clone.json();
-          window.lastFetchedData = data; // cache result
-          populateTable(data);
-        }
-        return response;
-      });
-    };
-
     // Wire up the buttons
     document.querySelector('#view-selector .btn-secondary').addEventListener('click', () => {
       currentView = 'checklist';
@@ -1289,6 +1157,18 @@
     document.querySelector('#view-selector .btn-success').addEventListener('click', () => {
       currentView = 'financial';
       updateTableView('financial');
+    });
+  </script>
+  <script>
+    async function loadPartial(url, targetId) {
+      const res = await fetch(url, { cache: 'force-cache' });
+      if (!res.ok) throw new Error(`Failed to load ${url}: ${res.status}`);
+      document.getElementById(targetId).insertAdjacentHTML('beforeend', await res.text());
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadPartial('partials/box-details-modal.html', 'boxInfoModalMount')
+        .catch(err => console.error(err));
     });
   </script>
 </body>
