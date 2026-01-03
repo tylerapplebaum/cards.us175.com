@@ -7,6 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
   <script src="js/exportCSV.js"></script>
+  <script src="js/utilities.js"></script>
   <script src="js/lookups.js" defer></script>
   <script src="js/importCSV.js" defer></script>
   <link rel="manifest" href="public/manifest.webmanifest">
@@ -486,10 +487,6 @@
       console.log("Cleared previous search inputs.");
     }
 
-    function generateUUID(inputId) {
-      document.getElementById(inputId).value = crypto.randomUUID();
-    }
-
     function tableFilterFunction() {
       // https://www.w3schools.com/howto/howto_js_filter_table.asp
       // https://stackoverflow.com/a/1085810
@@ -596,7 +593,7 @@
       Object.entries(modalFieldMap).forEach(([key, elementId]) => {
         const el = document.getElementById(elementId);
         if (el) {
-          el.value = sanitizeValue(item[key]);
+          el.value = sanitize(item[key]);
         }
       });
 
@@ -608,12 +605,6 @@
     }
 
     // Fetch existing items and populate the table    
-    function sanitizeValue(value) {
-      if (value === undefined || value === null || value === 'undefined') {
-        return '';
-      }
-      return String(value).trim();
-    }
     function fetchItems() {
       var set = document.getElementById('setSearchList').value;
       var subset = document.getElementById('subsetSearchList').value;
@@ -766,15 +757,6 @@
         });
     }
 
-    function sanitize(value) {
-      if (value == null) return '';
-
-      return String(value)
-        .replace(/\s+/g, ' ')   // collapse tabs/newlines to single space
-        .trim()                 // remove leading/trailing whitespace
-        .replace(/^undefined$/i, '');
-    }
-
     // Update an existing item
     function updateItem(guid) {
       const rows = document.getElementsByClassName("column0");
@@ -902,16 +884,6 @@
     // Track the current view mode
     let currentView = 'checklist';
 
-    // ---- utilities ----
-    function formatMoney(value) {
-      const n = parseFloat(value);
-      return isNaN(n)
-        ? ''
-        : n.toLocaleString(undefined, {
-            style: 'currency',
-            currency: 'USD'
-          });
-    }
     // Helper: rebuild table based on view mode
     function updateTableView(view) {
       const itemsTable = document.getElementById('itemsTable');
