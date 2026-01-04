@@ -20,13 +20,13 @@ async function populateSelect({ url, key, selectId }) {
 
 function loadLookups() {
   populateSelect({
-    url: 'sets.json',
+    url: 'partials/sets.json',
     key: 'Sets',
     selectId: 'setSearchList'
   });
 
   populateSelect({
-    url: 'subsets.json',
+    url: 'partials/subsets.json',
     key: 'Subsets',
     selectId: 'subsetSearchList'
   });
@@ -38,7 +38,7 @@ function loadLookups() {
   });
 
   populateSelect({
-    url: 'boxes.json',
+    url: 'partials/boxes.json',
     key: 'Boxes',
     selectId: 'boxSearchList'
   });
