@@ -372,46 +372,7 @@ tbody tr:hover {
   table tbody tr td[hidden] {
     display: none !important;
   }
-
-  /*
-  table tbody tr td:nth-child(1):before {
-    content: "ID";
-  }
-
-  table tbody tr td:nth-child(2):before {
-    content: "Year";
-  }
-
-  table tbody tr td:nth-child(3):before {
-    content: "Set";
-  }
-
-  table tbody tr td:nth-child(4):before {
-    content: "Subset";
-  }
-
-  table tbody tr td:nth-child(5):before {
-    content: "CardNum";
-  }
-
-  table tbody tr td:nth-child(6):before {
-    content: "Player";
-  }
-
-  table tbody tr td:nth-child(7):before {
-    content: "Qty";
-  }
-
-  table tbody tr td:nth-child(8):before  { content: "Action"; }
-  table tbody tr td:nth-child(9):before  { content: "Serial #"; }
-  table tbody tr td:nth-child(10):before { content: "Auth"; }
-  table tbody tr td:nth-child(11):before { content: "Grade"; }
-  table tbody tr td:nth-child(12):before { content: "Cert #"; }
-  table tbody tr td:nth-child(13):before { content: "Box #"; }
-  table tbody tr td:nth-child(14):before { content: "Txn ID"; }
-  table tbody tr td:nth-child(15):before { content: "Purchase $"; }
-  table tbody tr td:nth-child(16):before { content: "Market $"; }
-  */
+  
   .column1,
   .column2,
   .column3,

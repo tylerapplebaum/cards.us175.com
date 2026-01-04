@@ -119,6 +119,7 @@ function populateTable(data) {
     }
 
     const row = document.createElement('tr');
+    row.dataset.guid = String(item.guid);
     row.innerHTML = baseCols + extraCols;
     applyMobileLabels(row);
     tbody.appendChild(row);

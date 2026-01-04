@@ -10,8 +10,8 @@
   <script src="js/lookups.js" defer></script>
   <script src="js/viewselector.js" defer></script>
   <script src="js/importCSV.js" defer></script>
-  <script src="js/exportCSV.js"></script>
-  <script src="js/utilities.js"></script>
+  <script src="js/exportCSV.js" defer></script>
+  <script src="js/utilities.js" defer></script>
   <link rel="manifest" href="public/manifest.webmanifest">
   <link rel="icon" href="public/favicon.ico" sizes="any">
   <link rel="icon" href="public/icon.svg" type="image/svg+xml">
@@ -20,12 +20,12 @@
   <link rel="apple-touch-icon" sizes="120x120" href="public/apple-touch-icon-120x120.png">
   <link rel="apple-touch-icon" sizes="120x120" href="public/apple-touch-icon-120x120-precomposed.png">
   <link rel="stylesheet" type="text/css" href="../vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="../css/util.css">
+  <link rel="stylesheet" type="text/css" href="css/main.css">
   <link rel="stylesheet" type="text/css" href="../fonts/font-awesome-4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" type="text/css" href="../vendor/animate/animate.css">
   <link rel="stylesheet" type="text/css" href="../vendor/select2/select2.min.css">
   <link rel="stylesheet" type="text/css" href="../vendor/perfect-scrollbar/perfect-scrollbar.css">
-  <link rel="stylesheet" type="text/css" href="../css/util.css">
-  <link rel="stylesheet" type="text/css" href="css/main.css">
   <style>
 	.update-transition {
         	transition: all 100ms ease-out;
@@ -149,7 +149,7 @@
                 </div>
                 <div class="form-group col-sm-2 mt-n1">
                   <label for="modal-Grade">Grade</label>
-                  <input type="text" class="form-control" id="modal-Grade" value="" readonly>
+                  <input type="text" class="form-control" pattern="^(?:[1-9](?:\.5)?|10)$" id="modal-Grade" value="" readonly>
                 </div>
                 <div class="form-group col-sm-4 mt-n1">
                   <label for="modal-CertNumber">Cert number</label>
@@ -275,7 +275,7 @@
                   <input type="text" id="authenticatorInput" placeholder="Authenticator" pattern="(?:^PSA$)|(?:BGS$)|(?:SGC$)|(?:CGC$)" class="form-control mb-2 mr-sm-2">
                 </div>
                 <div class="col">
-                  <input type="number" id="gradeInput" placeholder="Grade" class="form-control mb-2 mr-sm-2 flex-grow-1">
+                  <input type="text" id="gradeInput" placeholder="Grade" pattern="^(?:[1-9](?:\.5)?|10)$" class="form-control mb-2 mr-sm-2 flex-grow-1">
                 </div>
                 <div class="col">
                   <input type="text" id="certNumberInput" placeholder="Cert #" class="form-control mb-2 mr-sm-2">
@@ -675,68 +675,109 @@
         });
     }
 
-    // Update an existing item
-    function updateItem(guid) {
-      const rows = document.getElementsByClassName("column0");
-      // find the <tr> that contains this guid cell
-      let updaterow = null;
-      for (let z = 0; z < rows.length; z++) {
-        if (rows[z].textContent.trim() === String(guid).trim()) {
-          updaterow = rows[z].closest('tr');
-          break;
-        }
+    // updateItem helper
+    function setRowCell(row, colClass, value) {
+      const td = row.querySelector(`td.${colClass}`);
+      if (td) td.textContent = sanitize(value ?? '');
+    }
+
+    function updateCachedItem(guid, patch) {
+      const g = String(guid);
+
+      // update exportInventoryData (used for modal click + CSV)
+      let idx = -1;
+      if (Array.isArray(window.exportInventoryData)) {
+        idx = window.exportInventoryData.findIndex(i => String(i?.guid) === g);
+        if (idx !== -1) Object.assign(window.exportInventoryData[idx], patch);
       }
 
+      // update lastFetchedData.body (used for view switching / re-render)
+      if (window.lastFetchedData?.body) {
+        // if we found idx above, use it; otherwise find it here
+        if (idx === -1) {
+          idx = window.lastFetchedData.body.findIndex(i => String(i?.guid) === g);
+        }
+        if (idx !== -1) Object.assign(window.lastFetchedData.body[idx], patch);
+      }
+
+      // return the updated item if we can (handy for callers)
+      if (idx !== -1 && Array.isArray(window.exportInventoryData)) return window.exportInventoryData[idx];
+      if (idx !== -1 && window.lastFetchedData?.body) return window.lastFetchedData.body[idx];
+      return null;
+    }
+
+    // Update an existing item
+    function updateItem(guid) {
+      const updaterow = document.querySelector(
+        `#itemsTable tbody tr[data-guid="${CSS.escape(String(guid))}"]`
+      );
       if (!updaterow) {
         console.warn('Could not find table row for guid:', guid);
         return;
       }
-      const data = collectFromModal(modalFieldMap); // call helper
-      console.log('Update item with ID:', guid);
-      console.log(data);
+
+      const payload = collectFromModal(modalFieldMap);
+
       fetch('https://api.us175.com/demo-update-inventory', {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Item updated:', data);
-        statusCode = data.StatusCode;
-        if (statusCode == '200') {
-          editRowsFunction() // re-lock fields
-          updaterow.style.backgroundColor = "#28a745";
-          setTimeout(() => {
-            updaterow.style.background = "";
-          }, 750);
-          console.log('Updated guid:' + guid + ' HTTP status: ' + statusCode);
-          fetchItems(); // Refresh the table
-        } else {
-		      updaterow.style.backgroundColor = "#dc3545";
-		      setTimeout(() => {
-            updaterow.style.backgroundColor = "";
-          }, 750);
-          console.log('Error updating' + guid + ' HTTP error: ' + statusCode)
-        };
-      })
-      .catch(error => console.error('Error:', error));
-    } // end updateItem
+        .then(r => r.json())
+        .then(res => {
+          const statusCode = res.StatusCode;
+
+          if (statusCode == '200') {
+            editRowsFunction(); // re-lock fields
+
+            // update caches with the payload, not the API response
+            updateCachedItem(guid, payload);
+
+            // patch visible row using the payload
+            setRowCell(updaterow, 'column1', payload.Year);
+            setRowCell(updaterow, 'column2', payload.Set);
+            setRowCell(updaterow, 'column3', payload.Subset);
+            setRowCell(updaterow, 'column4', payload.CardNum);
+            setRowCell(updaterow, 'column5', payload.PlayerName);
+            setRowCell(updaterow, 'column6', payload.Qty);
+
+            if (currentView === 'details') {
+              setRowCell(updaterow, 'column8', payload.Authenticator);
+              setRowCell(updaterow, 'column9', payload.Grade);
+              setRowCell(updaterow, 'column10', payload.CertNumber);
+              setRowCell(updaterow, 'column11', payload.BoxNum);
+              setRowCell(updaterow, 'column12', payload.SerialNumber);
+            }
+
+            if (currentView === 'financial') {
+              setRowCell(updaterow, 'column8', payload.Authenticator);
+              setRowCell(updaterow, 'column9', payload.Grade);
+              setRowCell(updaterow, 'column10', payload.PurchasePrice);
+              setRowCell(updaterow, 'column11', payload.GradingFee);
+              setRowCell(updaterow, 'column12', payload.MktVal);
+              setRowCell(updaterow, 'column13', payload.TxnSource);
+            }
+
+            // (optional) update mobile data-labels
+            if (typeof applyMobileLabels === 'function') applyMobileLabels(updaterow);
+
+            updaterow.style.backgroundColor = "#28a745";
+            setTimeout(() => (updaterow.style.background = ""), 750);
+          } else {
+            updaterow.style.backgroundColor = "#dc3545";
+            setTimeout(() => (updaterow.style.backgroundColor = ""), 750);
+            console.log('Error updating', guid, 'HTTP error:', statusCode, res);
+          }
+        })
+        .catch(err => console.error('Error:', err));
+    }
 
     // Delete an item
     function deleteItem(guid) {
-      const rows = document.getElementsByClassName("column0");
-      // find the <tr> that contains this guid cell
-      let deleterow = null;
-      for (let z = 0; z < rows.length; z++) {
-        if (rows[z].textContent.trim() === String(guid).trim()) {
-          deleterow = rows[z].closest('tr');
-          break;
-        }
-      }
-
+      const deleterow = document.querySelector(
+        `#itemsTable tbody tr[data-guid="${CSS.escape(String(guid))}"]`
+      );
       if (!deleterow) {
         console.warn('Could not find table row for guid:', guid);
         return;
@@ -762,7 +803,9 @@
           deleterow.style.backgroundColor = "#dc3545";
           setTimeout(() => deleterow.remove(), 200);
           console.log(statusCode)
-          fetchItems(); // Refresh the table
+          const badge = document.getElementById('num-results');
+          badge.textContent = Math.max(0, Number(badge.textContent) - 1);
+          // fetchItems(); // Refresh the table
         } else {
           console.log(statusCode)
         };
