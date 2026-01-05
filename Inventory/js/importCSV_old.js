@@ -3,75 +3,26 @@
 // - Displays row count and required-field validation status in #csvMeta
 // - Disables/enables #bulk-add button appropriately
 // - Shows an uploading spinner/state while POST is in-flight
+//
+// Assumptions:
+// - CSV is simple (no quoted commas/newlines). If you later need full CSV parsing, swap parseCsvLineSimple.
 
-// RFC4180-ish CSV parser that supports:
-// - commas inside quoted fields (e.g., "Mike Trout, Shohei Ohtani")
-// - escaped quotes inside quoted fields (e.g., "He said ""Hi""")
-// - CRLF or LF newlines
-// Note: this also supports newlines inside quoted fields.
-function parseCsv(text) {
-  const rows = [];
-  let row = [];
-  let field = '';
-  let inQuotes = false;
-
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-
-    if (inQuotes) {
-      if (c === '"') {
-        // Escaped quote
-        if (text[i + 1] === '"') {
-          field += '"';
-          i++;
-        } else {
-          inQuotes = false;
-        }
-      } else {
-        field += c;
-      }
-      continue;
-    }
-
-    // Not in quotes
-    if (c === '"') {
-      inQuotes = true;
-    } else if (c === ',') {
-      row.push(field);
-      field = '';
-    } else if (c === '\n' || c === '\r') {
-      // End of line (handle CRLF)
-      row.push(field);
-      field = '';
-      rows.push(row);
-      row = [];
-
-      if (c === '\r' && text[i + 1] === '\n') i++;
-    } else {
-      field += c;
-    }
-  }
-
-  // Flush last field/row (even if file doesn't end with newline)
-  row.push(field);
-  rows.push(row);
-
-  // Drop trailing completely-empty rows (common when file ends with newline)
-  while (rows.length && rows[rows.length - 1].every(v => String(v ?? '') === '')) {
-    rows.pop();
-  }
-
-  return rows;
+function parseCsvLineSimple(line) {
+  // Simple split: OK for your example CSV (no quoted commas)
+  return line.split(',').map(v => v.trim());
 }
 
 function analyzeCsv(text) {
-  const rows = parseCsv(String(text || ''));
+  const lines = text
+    .split(/\r?\n/)
+    .map(l => l.trim())
+    .filter(l => l.length > 0);
 
-  if (rows.length === 0) {
+  if (lines.length === 0) {
     return { rows: 0, invalid: 0, missingPlayerName: 0, missingBoxNum: 0, headerError: false };
   }
 
-  const header = rows[0].map(h => String(h ?? '').trim());
+  const header = parseCsvLineSimple(lines[0]);
   const idxPlayer = header.indexOf('PlayerName');
   const idxBox = header.indexOf('BoxNum');
 
@@ -79,25 +30,25 @@ function analyzeCsv(text) {
   if (idxPlayer === -1 || idxBox === -1) {
     return {
       rows: 0,
-      invalid: Math.max(0, rows.length - 1),
+      invalid: Math.max(0, lines.length - 1),
       missingPlayerName: 0,
       missingBoxNum: 0,
       headerError: true
     };
   }
 
-  let dataRows = 0;
+  let rows = 0;
   let missingPlayerName = 0;
   let missingBoxNum = 0;
 
-  for (let i = 1; i < rows.length; i++) {
-    const cols = rows[i].map(v => String(v ?? ''));
+  for (let i = 1; i < lines.length; i++) {
+    const cols = parseCsvLineSimple(lines[i]);
 
     // Count as a data row if it has at least one non-empty value
-    const hasAnyData = cols.some(c => c.trim() !== '');
+    const hasAnyData = cols.some(c => c !== '');
     if (!hasAnyData) continue;
 
-    dataRows++;
+    rows++;
 
     const player = (cols[idxPlayer] ?? '').trim();
     const box = (cols[idxBox] ?? '').trim();
@@ -107,7 +58,7 @@ function analyzeCsv(text) {
   }
 
   const invalid = missingPlayerName + missingBoxNum;
-  return { rows: dataRows, invalid, missingPlayerName, missingBoxNum, headerError: false };
+  return { rows, invalid, missingPlayerName, missingBoxNum, headerError: false };
 }
 
 // Base64 CSV data used by bulkUpload()
