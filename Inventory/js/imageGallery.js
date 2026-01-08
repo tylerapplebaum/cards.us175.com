@@ -32,8 +32,11 @@ function openImageGallery(guid) {
     return;
   }
 
-  const frontUrl = `../test-gallery/${encodeURIComponent(g)}-front.jpg`;
-  const backUrl  = `../test-gallery/${encodeURIComponent(g)}-back.jpg`;
+  //const frontUrl = `../test-gallery/${encodeURIComponent(g)}-front.jpg`;
+  //const backUrl  = `../test-gallery/${encodeURIComponent(g)}-back.jpg`;
+
+  const frontUrl = `../test-gallery/${encodeURIComponent(g)}-front.webp`;
+  const backUrl  = `../test-gallery/${encodeURIComponent(g)}-back.webp`;
 
   if (statusEl) statusEl.textContent = `GUID: ${g}`;
 

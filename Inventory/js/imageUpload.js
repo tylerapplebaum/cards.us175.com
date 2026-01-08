@@ -49,13 +49,81 @@ function openImageUpload(guid) {
   }
 }
 
+function blobToDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Failed to read blob"));
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.readAsDataURL(blob);
+  });
+}
+
+// Returns { blob, contentType, dataUrl, width, height, bytes }
+async function optimizeToWebP(file, {
+  maxDim = 2200,       // good default for card photos
+  quality = 0.80,      // 0..1 (lower => smaller)
+  forceSRGB = true,    // keeps colors sane across browsers
+} = {}) {
+  // Decode
+  const bitmap = await createImageBitmap(file);
+
+  // Compute scale
+  const w0 = bitmap.width;
+  const h0 = bitmap.height;
+  const scale = Math.min(1, maxDim / Math.max(w0, h0));
+  const w = Math.max(1, Math.round(w0 * scale));
+  const h = Math.max(1, Math.round(h0 * scale));
+
+  // Draw to canvas
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+
+  const ctx = canvas.getContext("2d", { alpha: false, colorSpace: forceSRGB ? "srgb" : undefined });
+  ctx.drawImage(bitmap, 0, 0, w, h);
+
+  // Encode WebP
+  const blob = await new Promise((resolve) => {
+    canvas.toBlob(
+      (b) => resolve(b),
+      "image/webp",
+      quality
+    );
+  });
+
+  if (!blob) throw new Error("WebP conversion failed (canvas.toBlob returned null)");
+
+  const dataUrl = await blobToDataUrl(blob);
+
+  return {
+    blob,
+    contentType: "image/webp",
+    dataUrl,
+    width: w,
+    height: h,
+    bytes: blob.size,
+  };
+}
+
+// Base64 payload without "data:...;base64," prefix
+function dataUrlToBase64(dataUrl) {
+  return (String(dataUrl).split("base64,")[1] || "");
+}
+
+// Rough estimate of JSON payload bytes (base64 expands ~4/3)
+function estimateJsonPayloadBytes(frontB64Len, backB64Len) {
+  // base64 length approximates bytes; JSON adds overhead, so pad a bit
+  const base64Bytes = frontB64Len + backB64Len;
+  return Math.round(base64Bytes * 1.05); // small cushion for JSON keys etc
+}
+
 // --- selection state ---
 const uploadState = {
   guid: "",
-  frontFile: null,
+  frontFile: null,          // original file (optional; keep)
   backFile: null,
-  frontDataUrl: "",
-  backDataUrl: "",
+  frontOptimized: null,     // { blob, contentType, dataUrl, bytes, width, height }
+  backOptimized: null,
 };
 
 function setStatus(msg, isError = false) {
@@ -68,15 +136,15 @@ function setStatus(msg, isError = false) {
 function setSubmitEnabled() {
   const btn = document.getElementById("imageUploadSubmitBtn");
   if (!btn) return;
-  btn.disabled = !(uploadState.guid && uploadState.frontFile && uploadState.backFile);
+  btn.disabled = !(uploadState.guid && uploadState.frontOptimized && uploadState.backOptimized);
 }
 
 function clearUploadSelection() {
   uploadState.guid = getActiveGuidFromDetailsModal_ForUpload();
   uploadState.frontFile = null;
   uploadState.backFile = null;
-  uploadState.frontDataUrl = "";
-  uploadState.backDataUrl = "";
+  uploadState.frontOptimized = null;
+  uploadState.backOptimized = null;
 
   // reset UI
   for (const side of ["front", "back"]) {
@@ -113,38 +181,43 @@ async function handlePickedFile(side, file) {
     setStatus("No GUID found for this item.", true);
     return;
   }
-
   if (!file) return;
 
-  // Optional strict JPEG enforcement:
-  if (!isProbablyJpeg(file)) {
-    setStatus("Please upload a .jpg/.jpeg image (JPEG).", true);
-    return;
+  setStatus(`Optimizing ${side} image...`);
+
+  try {
+    // Convert to WebP + downscale
+    const optimized = await optimizeToWebP(file, {
+      maxDim: 2200,
+      quality: 0.80
+    });
+
+    const img = document.getElementById(`preview-${side}`);
+    const name = document.getElementById(`name-${side}`);
+
+    if (img) {
+      img.src = optimized.dataUrl;
+      img.classList.remove("d-none");
+    }
+    if (name) {
+      const kb = Math.round(optimized.bytes / 1024);
+      name.textContent = `${file.name} → webp (${optimized.width}×${optimized.height}, ${kb} KB)`;
+    }
+
+    if (side === "front") {
+      uploadState.frontFile = file;
+      uploadState.frontOptimized = optimized;
+    } else {
+      uploadState.backFile = file;
+      uploadState.backOptimized = optimized;
+    }
+
+    setStatus("");
+    setSubmitEnabled();
+  } catch (e) {
+    console.error(e);
+    setStatus(`Could not optimize ${side} image.`, true);
   }
-
-  const dataUrl = await fileToDataUrl(file);
-
-  const img = document.getElementById(`preview-${side}`);
-  const name = document.getElementById(`name-${side}`);
-
-  if (img) {
-    img.src = dataUrl;
-    img.classList.remove("d-none");
-  }
-  if (name) {
-    name.textContent = file.name;
-  }
-
-  if (side === "front") {
-    uploadState.frontFile = file;
-    uploadState.frontDataUrl = dataUrl;
-  } else {
-    uploadState.backFile = file;
-    uploadState.backDataUrl = dataUrl;
-  }
-
-  setStatus("");
-  setSubmitEnabled();
 }
 
 function wireDropZone(side) {
@@ -204,30 +277,31 @@ async function uploadImages() {
   try {
     // Extract base64 payload from data URLs
     // dataUrl format: "data:image/jpeg;base64,AAAA..."
-    const frontBase64 = (uploadState.frontDataUrl.split("base64,")[1] || "");
-    const backBase64  = (uploadState.backDataUrl.split("base64,")[1] || "");
+    const frontB64 = dataUrlToBase64(uploadState.frontOptimized.dataUrl);
+    const backB64  = dataUrlToBase64(uploadState.backOptimized.dataUrl);
 
-    // Required names:
-    const frontName = `${guid}-front.jpg`;
-    const backName  = `${guid}-back.jpg`;
+    // Safety check for HTTP API limit (10MB). Keep margin for headers/etc.
+    const est = estimateJsonPayloadBytes(frontB64.length, backB64.length);
+    const limit = 10 * 1024 * 1024; // 10MB
+    if (est > limit) {
+      setStatus("Optimized images are still too large for the 10MB API limit. Try lowering quality or max dimension.", true);
+      return;
+    }
 
-    // IMPORTANT:
-    // I don't know your API's exact JSON schema, so this uses a common pattern.
-    // Adjust field names to match your Lambda / integration if needed.
     const body = {
       guid,
       files: [
         {
-        side: "front",
-        originalName: uploadState.frontFile.name,
-        contentType: uploadState.frontFile.type || "image/jpeg",
-        dataBase64: frontBase64
+          side: "front",
+          originalName: uploadState.frontFile?.name || "",
+          contentType: "image/webp",
+          dataBase64: frontB64
         },
         {
-        side: "back",
-        originalName: uploadState.backFile.name,
-        contentType: uploadState.backFile.type || "image/jpeg",
-        dataBase64: backBase64
+          side: "back",
+          originalName: uploadState.backFile?.name || "",
+          contentType: "image/webp",
+          dataBase64: backB64
         }
       ]
     };
