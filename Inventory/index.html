@@ -103,14 +103,17 @@
           <div class="modal-body">
             <form id="detailsForm">
               <div class="form-row mt-n1">
-                <div class="form-group col-sm-10 mt-n1">
+                <div class="form-group col-sm-8 mt-n1">
                   <label for="modal-guid">GUID</label>
                   <input type="text" class="form-control" id="modal-guid" value="" disabled>
                 </div>
-                <div class="form-group col-sm-2 mt-n1">
+                <div class="form-group col-sm-4 mt-n1">
                   <label for="modal-image-gallery">Images</label>
                     <button type="button" href="#" class="btn btn-outline*" onclick="openImageGalleryFromDetails(); return false;">
                       <img src="public/image-icon.svg" width="40" height="25" class="d-inline-block align-top" alt="image-gallery-link" title="Image Gallery">
+                    </button>
+                    <button type="button" class="btn btn-outline*" onclick="openImageUploadFromDetails(); return false;">
+                      <img src="public/file-earmark-image.svg" width="25" height="25" alt="upload-images" title="Upload Images">
                     </button>
                 </div>
               </div>
@@ -424,6 +427,7 @@
   <script src="../vendor/select2/select2.min.js"></script>
   <script src="../js/main.js"></script>
   <script src="js/imageGallery.js"></script>
+  <script src="js/imageUpload.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       loadLookups();
@@ -822,10 +826,14 @@
   </script>
 
   <script>
-    async function loadPartial(url, targetId) {
+    async function loadPartial(url, targetId, onLoad) {
       const res = await fetch(url, { cache: 'force-cache' });
       if (!res.ok) throw new Error(`Failed to load ${url}: ${res.status}`);
+
       document.getElementById(targetId).insertAdjacentHTML('beforeend', await res.text());
+
+      // run callback after HTML exists
+      if (typeof onLoad === 'function') onLoad();
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -834,10 +842,18 @@
 
       loadPartial('partials/image-gallery-modal.html', 'imageGalleryModalMount')
         .catch(err => console.error(err));
+
+      // IMPORTANT: init after modal markup is injected
+      loadPartial('partials/image-upload-modal.html', 'imageUploadModalMount', () => {
+        window.initImageUploadModal?.();
+      }).catch(err => console.error(err));
     });
   </script>
   <!-- Image Gallery Modal -->
   <div id="imageGalleryModalMount"></div>
   <!-- End Image Gallery Modal -->
+  <!-- Image Upload Modal -->
+  <div id="imageUploadModalMount"></div>
+  <!-- End Image Upload Modal -->
 </body>
 </html>

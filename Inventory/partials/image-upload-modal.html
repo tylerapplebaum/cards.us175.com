@@ -1,0 +1,53 @@
+<!-- partials/image-upload-modal.html -->
+<div class="modal fade" id="imageUpload" tabindex="-1" role="dialog" aria-labelledby="imageUploadLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageUploadLabel">Upload Card Images</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-2 text-muted" id="imageUploadGuidLabel">GUID: (not set)</div>
+        <div class="small mb-3" id="imageUploadStatus"></div>
+
+        <div class="row">
+          <div class="col-12 col-md-6 mb-3">
+            <div class="font-weight-bold mb-1">Front</div>
+            <div id="drop-front" class="border rounded p-3 text-center" style="min-height: 140px; cursor: pointer;">
+              <div class="text-muted">Drag & drop front image here<br>or click to choose</div>
+              <input id="file-front" type="file" accept="image/*" class="d-none">
+              <img id="preview-front" alt="front preview" class="img-fluid mt-2 d-none" style="max-height: 180px;">
+              <div id="name-front" class="small text-muted mt-2"></div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6 mb-3">
+            <div class="font-weight-bold mb-1">Back</div>
+            <div id="drop-back" class="border rounded p-3 text-center" style="min-height: 140px; cursor: pointer;">
+              <div class="text-muted">Drag & drop back image here<br>or click to choose</div>
+              <input id="file-back" type="file" accept="image/*" class="d-none">
+              <img id="preview-back" alt="back preview" class="img-fluid mt-2 d-none" style="max-height: 180px;">
+              <div id="name-back" class="small text-muted mt-2"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-secondary py-2 mb-0">
+          Required filenames:
+          <div class="small mb-0">
+            <code id="req-front">(guid)-front.jpg</code><br>
+            <code id="req-back">(guid)-back.jpg</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" id="imageUploadClearBtn">Clear</button>
+        <button type="button" class="btn btn-primary" id="imageUploadSubmitBtn" disabled>Upload</button>
+      </div>
+    </div>
+  </div>
+</div>
