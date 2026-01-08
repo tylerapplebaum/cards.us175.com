@@ -58,6 +58,55 @@ function blobToDataUrl(blob) {
   });
 }
 
+let webpEncodeSupportPromise = null;
+let wasmWebPEncoderPromise = null;
+
+function canEncodeWebP() {
+  if (webpEncodeSupportPromise) return webpEncodeSupportPromise;
+  webpEncodeSupportPromise = new Promise((resolve) => {
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1;
+      canvas.height = 1;
+      canvas.toBlob((blob) => {
+        resolve(!!(blob && blob.type === "image/webp"));
+      }, "image/webp", 0.8);
+    } catch (_) {
+      resolve(false);
+    }
+  });
+  return webpEncodeSupportPromise;
+}
+
+function getWasmWebPEncoder() {
+  if (wasmWebPEncoderPromise) return wasmWebPEncoderPromise;
+  const url = new URL("../vendor/jsquash-webp/encode.js", window.location.origin);
+  wasmWebPEncoderPromise = import(url.href);
+  return wasmWebPEncoderPromise;
+}
+
+function canvasToBlob(canvas, type, quality) {
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => resolve(blob), type, quality);
+  });
+}
+
+async function encodeCanvasToWebP(canvas, ctx, quality) {
+  const webpSupported = await canEncodeWebP();
+  if (webpSupported) {
+    const blob = await canvasToBlob(canvas, "image/webp", quality);
+    if (blob && blob.type === "image/webp") return blob;
+  }
+
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const encoder = await getWasmWebPEncoder();
+  const buffer = await encoder.default(
+    { data: imageData.data, width: imageData.width, height: imageData.height },
+    { quality: Math.round(quality * 100) }
+  );
+  return new Blob([buffer], { type: "image/webp" });
+}
+
 // Returns { blob, contentType, dataUrl, width, height, bytes }
 async function optimizeToWebP(file, {
   maxDim = 2200,       // good default for card photos
@@ -82,16 +131,10 @@ async function optimizeToWebP(file, {
   const ctx = canvas.getContext("2d", { alpha: false, colorSpace: forceSRGB ? "srgb" : undefined });
   ctx.drawImage(bitmap, 0, 0, w, h);
 
-  // Encode WebP
-  const blob = await new Promise((resolve) => {
-    canvas.toBlob(
-      (b) => resolve(b),
-      "image/webp",
-      quality
-    );
-  });
+  // Encode WebP (native if available, otherwise WASM).
+  const blob = await encodeCanvasToWebP(canvas, ctx, quality);
 
-  if (!blob) throw new Error("WebP conversion failed (canvas.toBlob returned null)");
+  if (!blob) throw new Error("WebP conversion failed (encoder returned null)");
 
   const dataUrl = await blobToDataUrl(blob);
 
@@ -216,7 +259,8 @@ async function handlePickedFile(side, file) {
     setSubmitEnabled();
   } catch (e) {
     console.error(e);
-    setStatus(`Could not optimize ${side} image.`, true);
+    const msg = (e && e.message) ? e.message : `Could not optimize ${side} image.`;
+    setStatus(msg, true);
   }
 }
 
@@ -294,13 +338,13 @@ async function uploadImages() {
         {
           side: "front",
           originalName: uploadState.frontFile?.name || "",
-          contentType: "image/webp",
+          contentType: uploadState.frontOptimized.contentType,
           dataBase64: frontB64
         },
         {
           side: "back",
           originalName: uploadState.backFile?.name || "",
-          contentType: "image/webp",
+          contentType: uploadState.backOptimized.contentType,
           dataBase64: backB64
         }
       ]
