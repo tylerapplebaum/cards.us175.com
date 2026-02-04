@@ -403,3 +403,21 @@ tbody tr:hover {
     padding-right: 15px;
   }
 }
+
+/* iOS Safari: prevent date inputs from forcing wider-than-column layout */
+#staticBackdrop input[type="date"].form-control,
+.modal-TxnDate {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;            /* key for flex/grid shrink */
+  box-sizing: border-box;
+  -webkit-appearance: none; /* reduces iOS "special control" sizing */
+  appearance: none;
+  text-align: left;
+}
+
+/* Also helps in Bootstrap form rows so children can actually shrink */
+#staticBackdrop .form-row > [class*="col-"],
+#staticBackdrop .form-group {
+  min-width: 0;
+}
