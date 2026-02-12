@@ -231,6 +231,33 @@
                   <label for="modal-SalePrice">Sale price</label>
                   <input type="text" class="form-control" id="modal-SalePrice" pattern="(?:^[1-9]([0-9]+)?(?:\.[0-9]{1,2})?$)|(?:^(?:0)$)|(?:^[0-9]\.[0-9](?:[0-9])?$)" value="" readonly>
                 </div>
+                <div class="form-group col-sm-4 mt-n1">
+                  <label for="modal-SaleDate">Sale date</label>
+                  <input type="date" class="form-control" id="modal-SaleDate" value="" readonly>
+                </div>
+                <div class="form-group col-sm-4 mt-n1">
+                  <label for="modal-SaleMarketplace">Sale marketplace</label>
+                  <input type="text" class="form-control" id="modal-SaleMarketplace" list="TxnSourceList" value="" readonly>
+                </div>
+                <div class="form-row mt-n1">
+                  <div class="form-group col-sm-8 mt-n1">
+                    <label for="modal-SoldTxnId">Sold Transaction ID</label>
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">
+                          <a href="#" onclick="generateUUID('modal-SoldTxnId'); return false;">
+                              <img src="../img/arrow-repeat.svg" alt="generate new UUID">
+                          </a>
+                        </span>
+                      </div>
+                    <input type="text" class="form-control" id="modal-SoldTxnId" value="" readonly>
+                    </div>
+                  </div>
+                  <div class="form-group col-sm-4 mt-n1">
+                    <label for="modal-SoldeBayItemId">Sold eBay item</label>
+                    <input type="text" class="form-control" id="modal-SoldeBayItemId" value="" pattern="[\d]{12}" readonly>
+                  </div>
+                </div>
               </div>
               <button type="submit" class="btn btn-warning" id="modal-update-button">Update</button>
             </form>
@@ -524,7 +551,11 @@
       TxnSource: 'modal-TxnSource',
       TxnType: 'modal-TxnType',
       GradingFee: 'modal-GradingFee',
-      MktVal: 'modal-MktVal'
+      MktVal: 'modal-MktVal',
+      SaleDate: 'modal-SaleDate',
+      SaleMarketplace: 'modal-SaleMarketplace',
+      SoldTxnId: 'modal-SoldTxnId',
+      SoldeBayItemId: 'modal-SoldeBayItemId'
     };
     function openModal(item) {
       activeGuid = item.guid;
