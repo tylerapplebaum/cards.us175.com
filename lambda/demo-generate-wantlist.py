@@ -79,7 +79,6 @@ def scan_all_inventory_items():
 
     return items
 
-
 def sort_wantlist(items):
     def _year(value):
         try:

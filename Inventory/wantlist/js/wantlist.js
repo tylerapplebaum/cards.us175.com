@@ -1,15 +1,8 @@
-let currentView = "checklist";
 let wantlistItems = [];
 
 function sanitizeValue(value) {
   if (value === undefined || value === null || value === "undefined") return "";
   return String(value).trim();
-}
-
-function formatMoney(value) {
-  const n = parseFloat(value);
-  if (Number.isNaN(n)) return "";
-  return n.toLocaleString(undefined, { style: "currency", currency: "USD" });
 }
 
 function setStatus(message, variant) {
@@ -19,7 +12,7 @@ function setStatus(message, variant) {
   banner.textContent = message;
 }
 
-function renderHeaders(view) {
+function renderHeaders() {
   const head = document.querySelector("#itemsTable thead tr");
   if (!head) return;
   head.innerHTML = `
@@ -31,33 +24,6 @@ function renderHeaders(view) {
     <th scope="col" class="column5">Player</th>
     <th scope="col" class="column6">Qty</th>
   `;
-
-  if (view === "details") {
-    head.insertAdjacentHTML(
-      "beforeend",
-      `
-      <th scope="col" class="column8">Authenticator</th>
-      <th scope="col" class="column9">Grade</th>
-      <th scope="col" class="column10">CertNum</th>
-      <th scope="col" class="column11">BoxNum</th>
-      <th scope="col" class="column12">SerialNumber</th>
-    `
-    );
-  }
-
-  if (view === "financial") {
-    head.insertAdjacentHTML(
-      "beforeend",
-      `
-      <th scope="col" class="column8">Authenticator</th>
-      <th scope="col" class="column9">Grade</th>
-      <th scope="col" class="column10">Purchase Price</th>
-      <th scope="col" class="column11">Grading Fee</th>
-      <th scope="col" class="column12">MktVal</th>
-      <th scope="col" class="column13">Txn Source</th>
-    `
-    );
-  }
 }
 
 function applyMobileLabels(rowEl) {
@@ -68,7 +34,7 @@ function applyMobileLabels(rowEl) {
   cells.forEach((td, i) => td.setAttribute("data-label", headers[i] || ""));
 }
 
-function renderRows(items, view) {
+function renderRows(items) {
   const tbody = document.querySelector("#itemsTable tbody");
   const tfoot = document.querySelector("#itemsTable tfoot tr");
   if (!tbody || !tfoot) return;
@@ -76,40 +42,7 @@ function renderRows(items, view) {
   tbody.innerHTML = "";
   tfoot.innerHTML = "";
 
-  let mktValTotal = 0;
-  let gradingFeeTotal = 0;
-  let purchasePriceTotal = 0;
-
   items.forEach((item) => {
-    let extraCols = "";
-    if (view === "details") {
-      extraCols = `
-        <td class="column8">${sanitizeValue(item.Authenticator)}</td>
-        <td class="column9">${sanitizeValue(item.Grade)}</td>
-        <td class="column10">${sanitizeValue(item.CertNumber)}</td>
-        <td class="column11">${sanitizeValue(item.BoxNum)}</td>
-        <td class="column12">${sanitizeValue(item.SerialNumber)}</td>
-      `;
-    }
-
-    if (view === "financial") {
-      const mktVal = parseFloat(item.MktVal);
-      const gradingFee = parseFloat(item.GradingFee);
-      const purchasePrice = parseFloat(item.PurchasePrice);
-      if (!Number.isNaN(mktVal)) mktValTotal += mktVal;
-      if (!Number.isNaN(gradingFee)) gradingFeeTotal += gradingFee;
-      if (!Number.isNaN(purchasePrice)) purchasePriceTotal += purchasePrice;
-
-      extraCols = `
-        <td class="column8">${sanitizeValue(item.Authenticator)}</td>
-        <td class="column9">${sanitizeValue(item.Grade)}</td>
-        <td class="column10">${sanitizeValue(item.PurchasePrice)}</td>
-        <td class="column11">${sanitizeValue(item.GradingFee)}</td>
-        <td class="column12">${sanitizeValue(item.MktVal)}</td>
-        <td class="column13">${sanitizeValue(item.TxnSource)}</td>
-      `;
-    }
-
     const row = document.createElement("tr");
     row.dataset.guid = sanitizeValue(item.guid);
     row.innerHTML = `
@@ -120,21 +53,10 @@ function renderRows(items, view) {
       <td class="column4">${sanitizeValue(item.CardNum)}</td>
       <td class="column5">${sanitizeValue(item.PlayerName)}</td>
       <td class="column6">${sanitizeValue(item.Qty)}</td>
-      ${extraCols}
     `;
     applyMobileLabels(row);
     tbody.appendChild(row);
   });
-
-  if (view === "financial") {
-    tfoot.innerHTML = `
-      <th colspan="9"></th>
-      <th title="Purchase price total">${formatMoney(purchasePriceTotal)}</th>
-      <th title="Grading fee total">${formatMoney(gradingFeeTotal)}</th>
-      <th title="Market value total">${formatMoney(mktValTotal)}</th>
-      <th colspan="1"></th>
-    `;
-  }
 }
 
 function applyFilter() {
@@ -208,8 +130,8 @@ function setGeneratedAt(value) {
 }
 
 function renderView() {
-  renderHeaders(currentView);
-  renderRows(wantlistItems, currentView);
+  renderHeaders();
+  renderRows(wantlistItems);
   applyFilter();
 }
 
@@ -231,13 +153,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("tableFilter")?.addEventListener("input", applyFilter);
   document.getElementById("tableFilterSelect")?.addEventListener("change", applyFilter);
   document.getElementById("exportBtn")?.addEventListener("click", exportVisibleToCSV);
-
-  document.querySelectorAll("#view-selector [data-view]").forEach((button) => {
-    button.addEventListener("click", () => {
-      currentView = button.dataset.view || "checklist";
-      renderView();
-    });
-  });
 
   try {
     await loadWantlist();

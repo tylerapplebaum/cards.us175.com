@@ -18,6 +18,15 @@ REGION = "us-east-2"
 PUBLIC_PATH_PREFIXES = (
     "/Inventory/wantlist",
 )
+PUBLIC_ASSET_PREFIXES = (
+    "/vendor/",
+    "/css/",
+    "/fonts/",
+    "/js/",
+    "/img/",
+    "/Inventory/css/",
+    "/Inventory/public/",
+)
 
 
 def is_public_path(uri):
@@ -25,6 +34,13 @@ def is_public_path(uri):
     Return True for paths that should bypass auth checks.
     """
     return any(uri == p or uri.startswith(f"{p}/") for p in PUBLIC_PATH_PREFIXES)
+
+
+def is_public_asset(uri):
+    """
+    Return True for static assets needed by the public wantlist page.
+    """
+    return any(uri.startswith(prefix) for prefix in PUBLIC_ASSET_PREFIXES)
 
 def lambda_handler(event, context):
     request = event["Records"][0]["cf"]["request"]
@@ -36,7 +52,7 @@ def lambda_handler(event, context):
     logger.info(f"requestedUri: {requestedUri}?{queryString}")
 
     # Allow selected public pages/files through without Cognito auth.
-    if is_public_path(requestedUri):
+    if is_public_path(requestedUri) or is_public_asset(requestedUri):
         logger.info("Public path requested - bypassing auth")
         return request
     
