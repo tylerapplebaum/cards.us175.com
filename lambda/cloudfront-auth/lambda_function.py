@@ -55,7 +55,7 @@ def lambda_handler(event, context):
 
     # If no token, redirect to Cognito login
     if not idToken:
-        logger.info("ID Token not found – redirecting to Cognito login")
+        logger.info("ID Token not found - redirecting to Cognito login")
         return create_redirect_to_login_response(
             request, requestedUri, queryString
         )
@@ -98,7 +98,7 @@ def lambda_handler(event, context):
         
         # Check if token is expired
         if time.time() > claims["exp"]:
-            logger.info("Token expired – redirecting to refresh")
+            logger.info("Token expired - redirecting to refresh")
             # FIXED: Pass the current URI and query string to the refresh function
             return create_redirect_to_refresh_response(requestedUri, queryString)
 

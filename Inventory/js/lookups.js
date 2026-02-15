@@ -1,6 +1,30 @@
+let authRedirectStarted = false;
+
+function isProtectedLookup(url) {
+  return url.startsWith('partials/') || url.startsWith('/Inventory/partials/');
+}
+
+function redirectToAuth() {
+  if (authRedirectStarted) return;
+  authRedirectStarted = true;
+
+  // Force a top-level navigation so CloudFront can perform the Cognito redirect.
+  window.location.assign(window.location.pathname + window.location.search);
+}
+
 async function populateSelect({ url, key, selectId }) {
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      credentials: 'same-origin',
+      redirect: 'manual'
+    });
+
+    // Browser hides cross-origin redirect targets from fetch as "opaqueredirect".
+    if (res.type === 'opaqueredirect' || res.status === 307 || res.status === 302) {
+      redirectToAuth();
+      return;
+    }
+
     if (!res.ok) throw new Error(`Failed to fetch ${url}`);
 
     const data = await res.json();
@@ -14,6 +38,12 @@ async function populateSelect({ url, key, selectId }) {
       list.appendChild(option);
     });
   } catch (err) {
+    // CORS-blocked redirected auth requests are surfaced as generic fetch failures.
+    if (err instanceof TypeError && isProtectedLookup(url)) {
+      redirectToAuth();
+      return;
+    }
+
     console.error(`Error loading ${selectId}:`, err);
   }
 }

@@ -1,7 +1,8 @@
 import urllib.parse
 
 # Hardcoded for Lambda@Edge
-USER_POOL_DOMAIN = "test-us175.auth.us-east-2.amazoncognito.com"
+#USER_POOL_DOMAIN = "test-us175.auth.us-east-2.amazoncognito.com"
+USER_POOL_DOMAIN = "auth.us175.com"
 CLIENT_ID = "38s6ieqmen5mf0oi0glnbhigj6"
 LOGOUT_REDIRECT = "https://inv.us175.com/landing/"
 

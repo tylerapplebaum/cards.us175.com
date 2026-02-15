@@ -55,7 +55,12 @@ def lambda_handler(event, context):
             #itemtxndate = :itemtxndate, \
             #itemtxnsource = :itemtxnsource, \
             #itemtxntype = :itemtxntype, \
-            #itemgradingfee = :itemgradingfee',
+            #itemgradingfee = :itemgradingfee, \
+            #itemmktval = :itemmktval, \
+            #itemsaledate = :itemsaledate, \
+            #itemsalemarketplace = :itemsalemarketplace, \
+            #itemsoldtxnid = :itemsoldtxnid, \
+            #itemsoldebayitemid = :itemsoldebayitemid',
             ExpressionAttributeNames={
                 '#itemset': 'Set',
                 '#itemyear': 'Year',
@@ -75,7 +80,12 @@ def lambda_handler(event, context):
                 '#itemtxndate': 'TxnDate',
                 '#itemtxnsource': 'TxnSource',
                 '#itemtxntype': 'TxnType',
-                '#itemgradingfee': 'GradingFee'
+                '#itemgradingfee': 'GradingFee',
+                '#itemmktval': 'MktVal',
+                '#itemsaledate': 'SaleDate',
+                '#itemsalemarketplace': 'SaleMarketplace',
+                '#itemsoldtxnid': 'SoldTxnId',
+                '#itemsoldebayitemid': 'SoldeBayItemId'
             },
             ExpressionAttributeValues={
                 ':itemset': {
@@ -134,6 +144,21 @@ def lambda_handler(event, context):
                 },
                 ':itemgradingfee':{
                     'N': safe_number(bodyParsed.get("GradingFee"))
+                },
+                ':itemmktval':{
+                    'N': safe_number(bodyParsed.get("MktVal"))
+                },
+                ':itemsaledate':{
+                    'S': bodyParsed.get('SaleDate', "")
+                },
+                ':itemsalemarketplace':{
+                    'S': bodyParsed.get('SaleMarketplace', "")
+                },
+                ':itemsoldtxnid':{
+                    'S': bodyParsed.get('SoldTxnId', "")
+                },
+                ':itemsoldebayitemid':{
+                    'S': bodyParsed.get('SoldeBayItemId', "")
                 }
             },
             ReturnValues='UPDATED_NEW',
