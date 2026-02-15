@@ -15,6 +15,16 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 REGION = "us-east-2"
+PUBLIC_PATH_PREFIXES = (
+    "/Inventory/wantlist",
+)
+
+
+def is_public_path(uri):
+    """
+    Return True for paths that should bypass auth checks.
+    """
+    return any(uri == p or uri.startswith(f"{p}/") for p in PUBLIC_PATH_PREFIXES)
 
 def lambda_handler(event, context):
     request = event["Records"][0]["cf"]["request"]
@@ -24,6 +34,11 @@ def lambda_handler(event, context):
     queryString = request.get("querystring", "")
 
     logger.info(f"requestedUri: {requestedUri}?{queryString}")
+
+    # Allow selected public pages/files through without Cognito auth.
+    if is_public_path(requestedUri):
+        logger.info("Public path requested - bypassing auth")
+        return request
     
     # --- NEW LOGIC: redirect root-level .png files to /Inventory/public/ ---
     if re.match(r"^/[^/]+\.(png|ico)$", requestedUri, re.IGNORECASE):  # e.g. "/apple-touch-icon.png" or "/favicon.ico"

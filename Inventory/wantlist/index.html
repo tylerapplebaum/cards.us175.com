@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>US175 Wantlist</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="../public/manifest.webmanifest">
+  <link rel="icon" href="../public/favicon.ico" sizes="any">
+  <link rel="icon" href="../public/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../public/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../public/apple-touch-icon-iphone-retina.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="../public/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="../public/apple-touch-icon-120x120-precomposed.png">
+  <link rel="stylesheet" type="text/css" href="../../vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="../../css/util.css">
+  <link rel="stylesheet" type="text/css" href="../css/main.css">
+  <link rel="stylesheet" type="text/css" href="../../fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="../../vendor/animate/animate.css">
+  <link rel="stylesheet" type="text/css" href="../../vendor/select2/select2.min.css">
+  <link rel="stylesheet" type="text/css" href="../../vendor/perfect-scrollbar/perfect-scrollbar.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">
+      <img src="../public/icon.svg" width="30" height="30" class="d-inline-block align-top" alt="us175-icon">
+      US175
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto align-items-center">
+        <li class="nav-item">
+          <a class="nav-link text-nowrap" href="https://test.us175.com/Inventory/">Inventory</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://test.us175.com/PriceArchive/">Price Archive</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://gallery.us175.com/">Gallery</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="https://test.us175.com/Inventory/wantlist/">Wantlist <span class="sr-only">(current)</span></a>
+        </li>
+      </ul>
+      <span class="navbar-text text-muted mr-2 small">
+        Updated: <span id="generated-at">-</span>
+      </span>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <div class="form-group">
+          <select class="custom-select custom-select-lg" id="tableFilterSelect">
+            <option selected value="column5">Player</option>
+            <option value="column1">Year</option>
+            <option value="column2">Set</option>
+            <option value="column3">Subset</option>
+            <option value="column4">CardNum</option>
+            <option value="column6">Qty</option>
+          </select>
+        </div>
+      </div>
+      <input type="text" id="tableFilter" placeholder="Filter wantlist" class="form-control form-control-lg mb-3" aria-label="Text input with dropdown button">
+      <button type="button" class="btn btn-primary mb-3" id="exportBtn">
+        <span class="badge"><img src="../../img/download_icon.svg" width="20" height="20" alt="download results"></span>
+        Results <span class="badge badge-light" id="num-results">0</span>
+      </button>
+      <div id="view-selector" class="btn-group ml-1" role="group" aria-label="Table view selectors">
+        <button type="button" class="btn btn-secondary mb-3" data-view="checklist">Checklist</button>
+        <button type="button" class="btn btn-info mb-3" data-view="details">Details</button>
+        <button type="button" class="btn btn-success mb-3" data-view="financial">Financial</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid mb-2">
+    <div class="alert alert-info py-2 mb-0" role="alert" id="statusBanner">
+      Loading wantlist data...
+    </div>
+  </div>
+
+  <div class="limiter">
+    <div class="container-table100">
+      <div class="table100 w-100">
+        <div>
+          <table id="itemsTable">
+            <thead>
+              <tr class="table100-head"></tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot>
+              <tr class="table100-foot"></tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../vendor/jquery/jquery-3.2.1.min.js"></script>
+  <script src="../../vendor/bootstrap/js/popper.js"></script>
+  <script src="../../vendor/bootstrap/js/bootstrap.min.js"></script>
+  <script src="../../vendor/select2/select2.min.js"></script>
+  <script src="../../js/main.js"></script>
+  <script src="js/wantlist.js"></script>
+</body>
+</html>
