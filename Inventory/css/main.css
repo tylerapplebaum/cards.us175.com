@@ -99,6 +99,48 @@ button {
   background: 0 0;
 }
 
+.search-inventory-btn {
+  --search-border-angle: 0turn;
+  --search-fill: linear-gradient(#fff, #fff);
+  --search-border: conic-gradient(
+    from var(--search-border-angle),
+    transparent 18%,
+    #17a2b8 30%,
+    #5bc0de 45%,
+    #0dcaf0 60%,
+    #17a2b8 78%,
+    transparent 90%
+  );
+  color: #138496;
+  border: 2px solid transparent;
+  background:
+    var(--search-fill) padding-box,
+    var(--search-border) border-box,
+    var(--search-fill) border-box;
+  background-position: center center;
+  animation: search-border-spin 3s linear infinite;
+  transition: color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.search-inventory-btn:hover,
+.search-inventory-btn:focus {
+  color: #0f6674;
+  box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.2);
+  --search-fill: linear-gradient(rgba(23, 162, 184, 0.08), rgba(23, 162, 184, 0.08));
+}
+
+@keyframes search-border-spin {
+  to {
+    --search-border-angle: 1turn;
+  }
+}
+
+@property --search-border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0turn;
+}
+
 div#searchToggle {
   transform: rotate(90deg);
 }
@@ -282,6 +324,25 @@ tbody tr:hover {
 
 .column7 {
   width: 100px;
+}
+
+.action-cell {
+  white-space: nowrap;
+}
+
+.action-cell .action-btn {
+  margin: 0 2px 0 0;
+  padding: 2px 6px;
+  line-height: 1.1;
+  vertical-align: middle;
+}
+
+.action-cell .action-btn:last-child {
+  margin-right: 0;
+}
+
+.action-cell .action-icon-btn {
+  padding: 1px 3px;
 }
 
 .column8 {

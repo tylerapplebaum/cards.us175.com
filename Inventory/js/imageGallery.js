@@ -3,6 +3,11 @@
 // Track whether we hid the details modal to open the gallery
 let reopenDetailsAfterGallery = false;
 
+function getGuidFromTriggerElement(triggerEl) {
+  const rowGuid = triggerEl?.closest?.("tr")?.dataset?.guid;
+  return String(rowGuid || "").trim();
+}
+
 function getActiveGuidFromDetailsModal() {
   // Prefer your activeGuid global if set, else read the field value
   const guidFromGlobal =
@@ -13,8 +18,8 @@ function getActiveGuidFromDetailsModal() {
   return (el && el.value ? el.value : "").trim();
 }
 
-function openImageGalleryFromDetails() {
-  const guid = getActiveGuidFromDetailsModal();
+function openImageGalleryFromDetails(triggerEl) {
+  const guid = getGuidFromTriggerElement(triggerEl) || getActiveGuidFromDetailsModal();
   openImageGallery(guid);
 }
 

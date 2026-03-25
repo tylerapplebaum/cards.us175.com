@@ -75,14 +75,34 @@ function populateTable(data) {
         <td class="column4">${sanitizeValue(item.CardNum)}</td>
         <td class="column5">${sanitizeValue(item.PlayerName)}</td>
         <td class="column6">${sanitizeValue(item.Qty)}</td>
-        <td class="column7">
+        <td class="column7 action-cell">
         <a href="#"
-            class="btn btn-info btn-sm details-btn"
+            class="btn btn-info btn-sm details-btn action-btn"
             data-index="${index}"
             data-toggle="modal"
             data-target="#staticBackdrop">
             Details
         </a>
+        <button type="button" href="#"
+            class="btn btn-outline* action-btn action-icon-btn"
+            onclick="openImageGalleryFromDetails(this); return false;"
+        >
+        <img src="public/image-icon.svg"
+            width="40" height="25"
+            class="d-inline-block align-top" alt="image-gallery-link"
+            title="Image Gallery"
+        >
+        </button>
+        <button type="button" 
+            class="btn btn-outline* action-btn action-icon-btn"
+            onclick="openImageUploadFromDetails(this); return false;"
+        >
+        <img src="public/file-earmark-image.svg"
+            width="25" height="25"
+            class="d-inline-block align-top" alt="upload-images"
+            title="Upload Images"
+        >
+        </button>
         </td>
     `;
 

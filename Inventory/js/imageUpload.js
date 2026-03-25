@@ -5,8 +5,16 @@
 // and avoids stacking modals (hides Item Details first, reopens after close).
 
 let reopenDetailsAfterUpload = false;
+let currentImageUploadGuid = "";
+
+function getGuidFromTriggerElementForUpload(triggerEl) {
+  const rowGuid = triggerEl?.closest?.("tr")?.dataset?.guid;
+  return String(rowGuid || "").trim();
+}
 
 function getActiveGuidFromDetailsModal_ForUpload() {
+  if (currentImageUploadGuid) return currentImageUploadGuid;
+
   const guidFromGlobal =
     (typeof activeGuid !== "undefined" && activeGuid) ? String(activeGuid).trim() : "";
   if (guidFromGlobal) return guidFromGlobal;
@@ -15,13 +23,14 @@ function getActiveGuidFromDetailsModal_ForUpload() {
   return (el && el.value ? el.value : "").trim();
 }
 
-function openImageUploadFromDetails() {
-  const guid = getActiveGuidFromDetailsModal_ForUpload();
+function openImageUploadFromDetails(triggerEl) {
+  const guid = getGuidFromTriggerElementForUpload(triggerEl) || getActiveGuidFromDetailsModal_ForUpload();
   openImageUpload(guid);
 }
 
 function openImageUpload(guid) {
   const g = String(guid || "").trim();
+  currentImageUploadGuid = g;
 
   // update labels
   const guidLabel = document.getElementById("imageUploadGuidLabel");
@@ -183,7 +192,7 @@ function setSubmitEnabled() {
 }
 
 function clearUploadSelection() {
-  uploadState.guid = getActiveGuidFromDetailsModal_ForUpload();
+  uploadState.guid = currentImageUploadGuid || getActiveGuidFromDetailsModal_ForUpload();
   uploadState.frontFile = null;
   uploadState.backFile = null;
   uploadState.frontOptimized = null;
@@ -219,7 +228,7 @@ function fileToDataUrl(file) {
 }
 
 async function handlePickedFile(side, file) {
-  uploadState.guid = getActiveGuidFromDetailsModal_ForUpload();
+  uploadState.guid = currentImageUploadGuid || getActiveGuidFromDetailsModal_ForUpload();
   if (!uploadState.guid) {
     setStatus("No GUID found for this item.", true);
     return;
@@ -303,7 +312,7 @@ function wireDropZone(side) {
 }
 
 async function uploadImages() {
-  uploadState.guid = getActiveGuidFromDetailsModal_ForUpload();
+  uploadState.guid = currentImageUploadGuid || getActiveGuidFromDetailsModal_ForUpload();
   const guid = uploadState.guid;
 
   if (!guid) {
@@ -402,12 +411,16 @@ function initImageUploadModal() {
 
   // When modal opens, refresh GUID label + required filenames
   $(document).on("shown.bs.modal", "#imageUpload", function () {
-    const guid = getActiveGuidFromDetailsModal_ForUpload();
+    const guid = currentImageUploadGuid || getActiveGuidFromDetailsModal_ForUpload();
     uploadState.guid = guid;
     document.getElementById("imageUploadGuidLabel").textContent = `GUID: ${guid || "(not set)"}`;
     document.getElementById("req-front").textContent = `${guid || "(guid)"}-front.jpg`;
     document.getElementById("req-back").textContent  = `${guid || "(guid)"}-back.jpg`;
     setSubmitEnabled();
+  });
+
+  $(document).on("hidden.bs.modal", "#imageUpload", function () {
+    currentImageUploadGuid = "";
   });
 }
 

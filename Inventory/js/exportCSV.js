@@ -11,7 +11,7 @@ function exportFullDataToCSV() {
         'Qty', 'SerialNumber', 'Authenticator', 'Grade', 'CertNumber', 
         'BoxNum', 'TxnId', 'eBayItemId', 'PurchasePrice', 
         'SalePrice', 'GradingFee', 'MktVal', 'TxnSource', 'TxnType', 
-        'TxnDate'
+        'TxnDate', 'SaleDate', 'SaleMarketplace', 'SoldTxnId', 'SoldeBayItemId'
     ];
     
     const fieldMap = {
@@ -35,7 +35,11 @@ function exportFullDataToCSV() {
         'MktVal': 'MktVal',
         'TxnSource': 'TxnSource',
         'TxnType': 'TxnType',
-        'TxnDate': 'TxnDate'
+        'TxnDate': 'TxnDate',
+        'SaleDate': 'SaleDate',
+        'SaleMarketplace': 'SaleMarketplace',
+        'SoldTxnId': 'SoldTxnId',
+        'SoldeBayItemId': 'SoldeBayItemId'
     };
     
     // Generate CSV content
