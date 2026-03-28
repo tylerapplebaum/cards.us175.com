@@ -1,6 +1,6 @@
 // js/imageUpload.js
 //
-// Uploads two images (front/back) for the active item guid.
+// Uploads one or two images (front/back) for the active item guid.
 // Uses the same guid resolution strategy as imageGallery.js: activeGuid -> #modal-guid
 // and avoids stacking modals (hides Item Details first, reopens after close).
 
@@ -188,7 +188,7 @@ function setStatus(msg, isError = false) {
 function setSubmitEnabled() {
   const btn = document.getElementById("imageUploadSubmitBtn");
   if (!btn) return;
-  btn.disabled = !(uploadState.guid && uploadState.frontOptimized && uploadState.backOptimized);
+  btn.disabled = !(uploadState.guid && (uploadState.frontOptimized || uploadState.backOptimized));
 }
 
 function clearUploadSelection() {
@@ -319,8 +319,8 @@ async function uploadImages() {
     setStatus("No GUID found for this item.", true);
     return;
   }
-  if (!uploadState.frontFile || !uploadState.backFile) {
-    setStatus("Please select both front and back images.", true);
+  if (!uploadState.frontOptimized && !uploadState.backOptimized) {
+    setStatus("Please select at least one image.", true);
     return;
   }
 
@@ -328,13 +328,33 @@ async function uploadImages() {
   if (btn) { btn.disabled = true; btn.textContent = "Uploading..."; }
 
   try {
-    // Extract base64 payload from data URLs
-    // dataUrl format: "data:image/jpeg;base64,AAAA..."
-    const frontB64 = dataUrlToBase64(uploadState.frontOptimized.dataUrl);
-    const backB64  = dataUrlToBase64(uploadState.backOptimized.dataUrl);
+    const files = [];
+    let totalBase64Length = 0;
+
+    if (uploadState.frontOptimized) {
+      const frontB64 = dataUrlToBase64(uploadState.frontOptimized.dataUrl);
+      totalBase64Length += frontB64.length;
+      files.push({
+        side: "front",
+        originalName: uploadState.frontFile?.name || "",
+        contentType: uploadState.frontOptimized.contentType,
+        dataBase64: frontB64
+      });
+    }
+
+    if (uploadState.backOptimized) {
+      const backB64 = dataUrlToBase64(uploadState.backOptimized.dataUrl);
+      totalBase64Length += backB64.length;
+      files.push({
+        side: "back",
+        originalName: uploadState.backFile?.name || "",
+        contentType: uploadState.backOptimized.contentType,
+        dataBase64: backB64
+      });
+    }
 
     // Safety check for HTTP API limit (10MB). Keep margin for headers/etc.
-    const est = estimateJsonPayloadBytes(frontB64.length, backB64.length);
+    const est = estimateJsonPayloadBytes(totalBase64Length, 0);
     const limit = 10 * 1024 * 1024; // 10MB
     if (est > limit) {
       setStatus("Optimized images are still too large for the 10MB API limit. Try lowering quality or max dimension.", true);
@@ -343,20 +363,7 @@ async function uploadImages() {
 
     const body = {
       guid,
-      files: [
-        {
-          side: "front",
-          originalName: uploadState.frontFile?.name || "",
-          contentType: uploadState.frontOptimized.contentType,
-          dataBase64: frontB64
-        },
-        {
-          side: "back",
-          originalName: uploadState.backFile?.name || "",
-          contentType: uploadState.backOptimized.contentType,
-          dataBase64: backB64
-        }
-      ]
+      files
     };
 
     const res = await fetch("https://api.us175.com/demo-inventory-img-upload", {
