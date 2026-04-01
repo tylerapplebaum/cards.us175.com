@@ -81,7 +81,7 @@ def lambda_handler(event, context):
         item = get_inventory_item(payload["guid"])
         secret = get_ebay_secret()
         access_token = get_user_access_token(secret)        
-        title = build_title(item)
+        title = payload["title"]
         aspects = build_item_specifics(item=item, payload=payload)
         condition_payload = build_condition_payload(item)
 
@@ -189,7 +189,7 @@ def get_fulfillment_policy_id_for_item(item: dict, payload: dict) -> str:
     return EBAY_FULFILLMENT_POLICY_ID_OVER20
 
 def validate_request_payload(payload: dict) -> None:
-    required = ["guid", "listingType", "allowOffers", "team", "autographed"]
+    required = ["guid", "title", "listingType", "allowOffers", "team", "autographed"]
     missing = [k for k in required if k not in payload]
     if missing:
         raise BadRequest(f"Missing required field(s): {', '.join(missing)}")
@@ -201,11 +201,14 @@ def validate_request_payload(payload: dict) -> None:
 
     payload["allowOffers"] = bool(payload["allowOffers"])
     payload["guid"] = str(payload["guid"]).strip()
+    payload["title"] = normalize_title(payload["title"])
     payload["team"] = str(payload["team"]).strip()
     payload["autographed"] = normalize_yes_no(payload["autographed"], field_name="autographed")
 
     if not payload["guid"]:
         raise BadRequest("guid must not be empty")
+    if not payload["title"]:
+        raise BadRequest("title must not be empty")
     if not payload["team"]:
         raise BadRequest("team must not be empty")
 
@@ -303,29 +306,6 @@ def get_user_access_token(secret: dict) -> str:
     if not token:
         raise RuntimeError("eBay token response did not include access_token")
     return token
-
-
-def build_title(item: dict) -> str:
-    grade = clean_str(item.get("Grade"))
-    if grade in {"0", "0.0"}:
-        grade = ""
-
-    parts = [
-        clean_str(item.get("Year")),
-        clean_str(item.get("Set")),
-        clean_str(item.get("Subset")),
-        clean_str(item.get("PlayerName")),
-        clean_str(item.get("Authenticator")),
-        grade,
-        clean_str(item.get("SerialNumber")),
-    ]
-    title = " ".join(p for p in parts if p)
-    title = re.sub(r"\s+", " ", title).strip()
-    if not title:
-        raise BadRequest("Unable to build title from inventory data")
-    # eBay title max length is 80 chars for standard listings.
-    return title[:80].rstrip()
-
 
 def build_item_specifics(item: dict, payload: dict) -> dict[str, list[str]]:
     has_authenticator = bool(clean_str(item.get("Authenticator")))
@@ -512,9 +492,9 @@ def build_inventory_payload(item: dict, title: str, aspects: dict, condition_pay
     return inventory_payload
 
 
-def build_description(item: dict) -> str:
+def build_description(item: dict, title: str) -> str:
     parts = [
-        build_title(item),
+        title,
         "",
         f"GUID: {safe_value(item.get('guid'))}",
         f"Set: {safe_value(item.get('Set'))}",
@@ -560,7 +540,7 @@ def build_offer_payload(item: dict, payload: dict, access_token: str) -> dict:
         "availableQuantity": 1,
         "categoryId": EBAY_CATEGORY_ID,
         "merchantLocationKey": EBAY_MERCHANT_LOCATION_KEY,
-        "listingDescription": build_description(item),
+        "listingDescription": build_description(item, payload["title"]),
         "listingDuration": listing_duration,
         "pricingSummary": {
             "price": {
@@ -839,6 +819,13 @@ def clean_str(value) -> str:
     if text.lower() in {"none", "null", "undefined"}:
         return ""
     return text
+
+
+def normalize_title(value) -> str:
+    text = clean_str(value)
+    text = re.sub(r"[.,]", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text[:80].rstrip()
 
 
 def safe_value(value) -> str:

@@ -864,7 +864,7 @@
 
   <script>
     async function loadPartial(url, targetId, onLoad) {
-      const res = await fetch(url, { cache: 'force-cache' });
+      const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) throw new Error(`Failed to load ${url}: ${res.status}`);
 
       document.getElementById(targetId).insertAdjacentHTML('beforeend', await res.text());
