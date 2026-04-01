@@ -103,6 +103,16 @@ function populateTable(data) {
             title="Upload Images"
         >
         </button>
+        <button type="button" href="#"
+            class="btn btn-outline* action-btn action-icon-btn"
+            onclick="openeBaySalesModal(this); return false;"
+        >
+        <img src="public/ebay.svg"
+            width="40" height="25"
+            class="d-inline-block align-top" alt="ebay icon"
+            title="List on eBay"
+        >
+        </button>
         </td>
     `;
 

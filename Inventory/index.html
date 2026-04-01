@@ -460,6 +460,7 @@
   <script src="../js/main.js"></script>
   <script src="js/imageGallery.js"></script>
   <script src="js/imageUpload.js"></script>
+  <script src="js/ebaySalesModal.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       loadLookups();
@@ -883,6 +884,10 @@
       loadPartial('partials/image-upload-modal.html', 'imageUploadModalMount', () => {
         window.initImageUploadModal?.();
       }).catch(err => console.error(err));
+
+      loadPartial('partials/ebay-sales-modal.html', 'eBaySalesModalMount', () => {
+        window.initEbaySalesModal?.();
+      }).catch(err => console.error(err));
     });
   </script>
   <!-- Image Gallery Modal -->
@@ -891,5 +896,8 @@
   <!-- Image Upload Modal -->
   <div id="imageUploadModalMount"></div>
   <!-- End Image Upload Modal -->
+  <!-- eBay Sales Modal -->
+  <div id="eBaySalesModalMount"></div>
+  <!-- End eBay Sales Modal -->
 </body>
 </html>

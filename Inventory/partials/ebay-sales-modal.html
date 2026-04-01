@@ -1,0 +1,75 @@
+<!-- partials/ebay-sales-modal.html -->
+<div class="modal fade" id="eBaySalesModal" tabindex="-1" role="dialog" aria-labelledby="eBaySalesModalLabel" aria-modal="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eBaySalesModalLabel">List Item on eBay</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form id="eBaySalesForm">
+          <div class="form-row">
+            <div class="form-group col-12">
+              <label for="eBaySalesGuid">GUID</label>
+              <input type="text" class="form-control" id="eBaySalesGuid" readonly>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-sm-6">
+              <label for="eBaySalesListingType">Listing Type</label>
+              <select class="custom-select form-control" id="eBaySalesListingType" required>
+                <option value="BUY_IT_NOW">BUY_IT_NOW</option>
+                <option value="AUCTION">AUCTION</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-6">
+              <label for="eBaySalesStartingBid">Starting Bid</label>
+              <input type="number" class="form-control" id="eBaySalesStartingBid" min="0" step="0.01" placeholder="Only for auctions" disabled>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-sm-6">
+              <label for="eBaySalesAllowOffers">Allow Offers</label>
+              <select class="custom-select form-control" id="eBaySalesAllowOffers" required>
+                <option value="false">false</option>
+                <option value="true">true</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-6">
+              <label for="eBaySalesAutographed">Autographed</label>
+              <select class="custom-select form-control" id="eBaySalesAutographed" required>
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-12">
+              <label for="eBaySalesTeam">Team</label>
+              <input type="text" class="form-control" id="eBaySalesTeam" placeholder="Team name" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-12 mb-1">
+              <label for="eBaySalesResponse">API Response</label>
+              <textarea class="form-control" id="eBaySalesResponse" rows="8" readonly placeholder="Response will appear here after submission."></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <div class="small text-muted mr-auto" id="eBaySalesStatus"></div>
+        <button type="button" class="btn btn-primary" id="eBaySalesSubmitBtn">Submit</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
