@@ -1,6 +1,16 @@
 // Track the current view mode
 let currentView = 'checklist';
 
+function shouldShowEbayListingIndicator() {
+    const { searchType, boxNum } = window.lastFetchContext || {};
+    return searchType === 'box' && (boxNum === 'T1' || boxNum === 'T2');
+}
+
+function getEbayIconStyle(item) {
+    if (!shouldShowEbayListingIndicator()) return '';
+    return item?.SoldeBayItemId ? '' : 'style="filter: grayscale(1);"';
+}
+
 // Helper: rebuild table based on view mode
 function updateTableView(view) {
     const itemsTable = document.getElementById('itemsTable');
@@ -67,6 +77,7 @@ function populateTable(data) {
     let gradingFeeTotal = 0;
     let purchPriceTotal = 0;
     data.body.forEach((item, index) => {
+    const ebayIconStyle = getEbayIconStyle(item);
     let baseCols = `
         <td class="column0" hidden>${sanitizeValue(item.guid)}</td>
         <td class="column1">${sanitizeValue(item.Year)}</td>
@@ -109,6 +120,7 @@ function populateTable(data) {
         >
         <img src="public/ebay.svg"
             width="40" height="25"
+            ${ebayIconStyle}
             class="d-inline-block align-top" alt="ebay icon"
             title="List on eBay"
         >

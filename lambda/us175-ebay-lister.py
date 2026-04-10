@@ -470,7 +470,7 @@ def build_inventory_payload(item: dict, title: str, aspects: dict, condition_pay
     guid = safe_value(item.get("guid"))
     product = {
         "title": title,
-        "description": build_description(item),
+        "description": build_description(item, title),
         "aspects": aspects,
         "imageUrls": [
             f"https://test.us175.com/test-gallery/{guid}-front.webp",

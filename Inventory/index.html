@@ -578,6 +578,10 @@
       var year = document.getElementById('queryYear').value;
       var boxnum = document.getElementById('boxSearchList').value;
       var playername = document.getElementById('playerSearchList').value;
+      window.lastFetchContext = {
+        searchType: searchtype,
+        boxNum: boxnum
+      };
       let data = {};
       if (set) {
         data = {
