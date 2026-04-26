@@ -31,6 +31,7 @@ EBAY_FULFILLMENT_POLICY_ID_UNDER20 = os.environ["EBAY_FULFILLMENT_POLICY_ID_UNDE
 EBAY_FULFILLMENT_POLICY_ID_OVER20 = os.environ["EBAY_FULFILLMENT_POLICY_ID_OVER20"]
 EBAY_PAYMENT_POLICY_ID = os.environ["EBAY_PAYMENT_POLICY_ID"]
 EBAY_RETURN_POLICY_ID = os.environ["EBAY_RETURN_POLICY_ID"]
+EBAY_PAYMENT_POLICY_ID_AUCTION = os.environ["EBAY_PAYMENT_POLICY_ID_AUCTION"]
 EBAY_MERCHANT_LOCATION_KEY = os.environ["EBAY_MERCHANT_LOCATION_KEY"]
 BUY_IT_NOW_LISTING_DURATION = os.environ["BUY_IT_NOW_LISTING_DURATION"]
 AUCTION_LISTING_DURATION = os.environ["AUCTION_LISTING_DURATION"]
@@ -108,11 +109,29 @@ def lambda_handler(event, context):
             access_token=access_token,
         )
         logger.info("Offer payload: %s", json.dumps(offer_payload))
+        try:
+            offer_result = create_offer(access_token=access_token, payload=offer_payload)
+            logger.info("eBay createOffer result: %s", json.dumps(offer_result))
+            offer_id = offer_result["offerId"]
+        except EbayApiError as e:
+            if e.payload:
+                errors = e.payload.get("errors", [])
+                for err in errors:
+                    if err.get("errorId") == 25002:
+                        # Offer already exists → reuse it
+                        offer_id = next(
+                            (p["value"] for p in err.get("parameters", []) if p["name"] == "offerId"),
+                            None
+                        )
+                        if not offer_id:
+                            raise
+                        logger.info("Reusing existing offerId: %s", offer_id)
+                        break
+                else:
+                    raise
+            else:
+                raise
 
-        offer_result = create_offer(access_token=access_token, payload=offer_payload)
-        logger.info("eBay createOffer result: %s", json.dumps(offer_result))
-
-        offer_id = offer_result["offerId"]
         publish_result = publish_offer(access_token=access_token, offer_id=offer_id)
         logger.info("eBay publishOffer result: %s", json.dumps(publish_result))
 
@@ -216,7 +235,7 @@ def validate_request_payload(payload: dict) -> None:
         if "startingBid" not in payload:
             raise BadRequest("startingBid is required when listingType is AUCTION")
         try:
-            starting_bid = int(payload["startingBid"])
+            starting_bid = to_decimal(payload["startingBid"])
         except (TypeError, ValueError):
             raise BadRequest("startingBid must be an integer")
         if starting_bid <= 0:
@@ -514,6 +533,10 @@ def build_description(item: dict, title: str) -> str:
 
     return "\n".join(parts)
 
+def get_payment_policy_id(listing_type: str) -> str:
+    if listing_type == "AUCTION":
+        return EBAY_PAYMENT_POLICY_ID_AUCTION
+    return EBAY_PAYMENT_POLICY_ID
 
 def build_offer_payload(item: dict, payload: dict, access_token: str) -> dict:
     listing_type = payload["listingType"]
@@ -527,30 +550,36 @@ def build_offer_payload(item: dict, payload: dict, access_token: str) -> dict:
         listing_start_date = None
         format_value = "FIXED_PRICE"
         listing_duration = BUY_IT_NOW_LISTING_DURATION
+        pricing_summary = {
+            "price": {
+                "currency": USD,
+                "value": price,
+            }
+        }
     else:
         price = format_currency_value(payload["startingBid"])
         listing_start_date = compute_same_day_auction_start_utc()
         format_value = "AUCTION"
         listing_duration = AUCTION_LISTING_DURATION
+        pricing_summary = {
+            "auctionStartPrice": {
+                "currency": USD,
+                "value": price,
+            }
+        }
 
     offer_payload = {
         "sku": safe_value(item.get("guid")),
         "marketplaceId": EBAY_MARKETPLACE_ID,
         "format": format_value,
-        "availableQuantity": 1,
         "categoryId": EBAY_CATEGORY_ID,
         "merchantLocationKey": EBAY_MERCHANT_LOCATION_KEY,
         "listingDescription": build_description(item, payload["title"]),
         "listingDuration": listing_duration,
-        "pricingSummary": {
-            "price": {
-                "currency": USD,
-                "value": price,
-            }
-        },
+        "pricingSummary": pricing_summary,
         "listingPolicies": {
             "fulfillmentPolicyId": fulfillment_policy_id,
-            "paymentPolicyId": EBAY_PAYMENT_POLICY_ID,
+            "paymentPolicyId": get_payment_policy_id(listing_type),
             "returnPolicyId": EBAY_RETURN_POLICY_ID,
         },
         "tax": {"applyTax": True},
@@ -563,6 +592,9 @@ def build_offer_payload(item: dict, payload: dict, access_token: str) -> dict:
         offer_payload["listingPolicies"]["bestOfferTerms"] = {
             "bestOfferEnabled": True
         }
+    
+    if listing_type == "BUY_IT_NOW":
+        offer_payload["availableQuantity"] = 1
 
 
     # Validate that required condition metadata exists before trying to publish.

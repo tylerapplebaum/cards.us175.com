@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <title>US175 Inventory</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
   <script src="js/searchandfilter.js" defer></script>
@@ -187,6 +190,12 @@
                     </div>
                   <input type="text" class="form-control" id="modal-TxnId" value="" readonly>
                   </div>
+                  <div class="mt-2 d-flex flex-wrap align-items-center">
+                    <button type="button" class="btn btn-outline-secondary btn-sm mr-2 mb-2" onclick="storeTxnIdFromInput('modal-TxnId')">Store</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm mr-2 mb-2" onclick="applyStoredTxnIdToInput('modal-TxnId')">Use Stored</button>
+                    <button type="button" class="btn btn-outline-danger btn-sm mr-2 mb-2" onclick="clearStoredTxnId()">Clear Stored</button>
+                    <small class="text-muted mb-2" data-txn-storage-status="modal-TxnId">Stored ID: none</small>
+                  </div>
                 </div>
                 <div class="form-group col-sm-4 mt-n1">
                   <label for="modal-eBayItemId">eBay item</label>
@@ -277,108 +286,149 @@
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropAddInventoryLabel">Item Details</h5>
+            <h5 class="modal-title" id="staticBackdropAddInventoryLabel">Add Inventory</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <form id="createForm">
-              <div class="form-row">
-                <div class="col-3">
-                  <input type="text" id="yearInput" placeholder="Year" class="form-control mb-2 mr-sm-2 flex-grow-1" required>
+              <div class="form-row mt-n1">
+                <div class="form-group col-sm-4 mt-n1">
+                  <label for="yearInput">Year</label>
+                  <input type="text" id="yearInput" placeholder="Year" class="form-control" required>
                 </div>
-                <div class="col">
-                  <input type="text" id="setInput" placeholder="Set" class="form-control mb-2 mr-sm-2" required>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="col-7">
-                  <input type="text" id="subsetInput" placeholder="Subset" class="form-control mb-2 mr-sm-2">
-                </div>
-                <div class="col">
-                  <input type="text" id="cardNumInput" placeholder="Card #" class="form-control mb-2 mr-sm-2">
-                </div>
-                <div class="col">
-                  <input type="text" id="serialNumberInput" placeholder="Serial #" class="form-control mb-2 mr-sm-2">
+                <div class="form-group col-sm-8 mt-n1">
+                  <label for="setInput">Set</label>
+                  <input type="text" id="setInput" placeholder="Set" class="form-control" required>
                 </div>
               </div>
-              <div class="form-row">
-                <div class="col-7">
-                  <input type="text" id="playerInput" placeholder="Player(s)" class="form-control mb-2 mr-sm-2" required>
+              <div class="form-row mt-n1">
+                <div class="form-group col-sm-8 mt-n1">
+                  <label for="subsetInput">Subset</label>
+                  <input type="text" id="subsetInput" placeholder="Subset" class="form-control">
                 </div>
-                <div class="col">
-                  <input type="number" id="qtyInput" placeholder="Qty" class="form-control mb-2 mr-sm-2" required>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="col">
-                  <input type="text" id="authenticatorInput" placeholder="Authenticator" pattern="(?:^PSA$)|(?:BGS$)|(?:SGC$)|(?:CGC$)" class="form-control mb-2 mr-sm-2">
-                </div>
-                <div class="col">
-                  <input type="text" id="gradeInput" placeholder="Grade" pattern="^(?:[0-9](?:\.5)?|10)$" class="form-control mb-2 mr-sm-2 flex-grow-1">
-                </div>
-                <div class="col">
-                  <input type="text" id="certNumberInput" placeholder="Cert #" class="form-control mb-2 mr-sm-2">
-                </div>
-                <div class="col">
-                  <input type="text" id="boxNumInput" placeholder="Box #" class="form-control mb-2 mr-sm-2" required>
+                <div class="form-group col-sm-4 mt-n1">
+                  <label for="cardNumInput">Card number</label>
+                  <input type="text" id="cardNumInput" placeholder="Card #" class="form-control">
                 </div>
               </div>
-              <div class="input-group mb-2 mr-sm-2">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">
-                    <a href="#" onclick="generateUUID('txnIdInput'); return false;">
-                        <img src="../img/arrow-repeat.svg" alt="generate new UUID">
-                    </a>
-                  </span>
+              <div class="form-row mt-n1">
+                <div class="form-group col-sm-6 mt-n1">
+                  <label for="playerInput">Player Name</label>
+                  <input type="text" id="playerInput" placeholder="Player(s)" class="form-control" required>
                 </div>
-                <input type="text" id="txnIdInput" placeholder="Txn ID" class="form-control">
+                <div class="form-group col-sm-2 mt-n1">
+                  <label for="qtyInput">Qty</label>
+                  <input type="number" id="qtyInput" placeholder="Qty" class="form-control" required>
+                </div>
+                <div class="form-group col-sm-4 mt-n1">
+                  <label for="serialNumberInput">Serial number</label>
+                  <input type="text" id="serialNumberInput" placeholder="Serial #" class="form-control">
+                </div>
               </div>
-              <input type="text" id="txnTypeInput" placeholder="Txn Type" list="TxnTypeList" value="Purchase" class="form-control mb-2 mr-sm-2">
+              <div class="form-row mt-n1">
+                <div class="form-group col-sm-4 mt-n1">
+                  <label for="authenticatorInput">Authenticator</label>
+                  <input type="text" id="authenticatorInput" placeholder="Authenticator" pattern="(?:^PSA$)|(?:BGS$)|(?:SGC$)|(?:CGC$)" class="form-control">
+                </div>
+                <div class="form-group col-sm-2 mt-n1">
+                  <label for="gradeInput">Grade</label>
+                  <input type="text" id="gradeInput" placeholder="Grade" pattern="^(?:[0-9](?:\.5)?|10)$" class="form-control">
+                </div>
+                <div class="form-group col-sm-4 mt-n1">
+                  <label for="certNumberInput">Cert number</label>
+                  <input type="text" id="certNumberInput" placeholder="Cert #" class="form-control">
+                </div>
+                <div class="form-group col-sm-2 mt-n1">
+                  <label for="boxNumInput">Box number</label>
+                  <input type="text" id="boxNumInput" placeholder="Box #" class="form-control" required>
+                </div>
+              </div>
+              <div class="form-row mt-n1">
+                <div class="form-group col-sm-8 mt-n1">
+                  <label for="txnIdInput">Transaction ID</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <a href="#" onclick="generateUUID('txnIdInput'); return false;">
+                            <img src="../img/arrow-repeat.svg" alt="generate new UUID">
+                        </a>
+                      </span>
+                    </div>
+                    <input type="text" id="txnIdInput" placeholder="Txn ID" class="form-control">
+                  </div>
+                  <div class="mt-2 d-flex flex-wrap align-items-center">
+                    <button type="button" class="btn btn-outline-secondary btn-sm mr-2 mb-2" onclick="storeTxnIdFromInput('txnIdInput')">Store</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm mr-2 mb-2" onclick="applyStoredTxnIdToInput('txnIdInput')">Use Stored</button>
+                    <button type="button" class="btn btn-outline-danger btn-sm mr-2 mb-2" onclick="clearStoredTxnId()">Clear Stored</button>
+                    <small class="text-muted mb-2" data-txn-storage-status="txnIdInput">Stored ID: none</small>
+                  </div>
+                </div>
+                <div class="form-group col-sm-4 mt-n1">
+                  <label for="eBayItemIdInput">eBay item</label>
+                  <input type="text" id="eBayItemIdInput" placeholder="eBay Item Id" pattern="[\d]{12}" class="form-control">
+                </div>
+              </div>
+              <div class="form-row mt-n1">
+                <div class="form-group col-sm-4 mt-n1">
+                  <label for="purchasePriceInput">Purchase price</label>
+                  <input type="number" id="purchasePriceInput" step=".01" placeholder="Purchase Price" class="form-control">
+                </div>
+                <div class="form-group col-sm-4 mt-n1">
+                  <label for="mktValInput">Market Value</label>
+                  <input type="number" id="mktValInput" step=".01" placeholder="Market Value" class="form-control">
+                </div>
+                <div class="form-group col-sm-4 mt-n1">
+                  <label for="gradingFeeInput">Grading fee</label>
+                  <input type="number" id="gradingFeeInput" placeholder="Grading Fee" class="form-control">
+                </div>
+              </div>
+              <div class="form-row mt-n1">
+                <div class="form-group col-sm-4 mt-n1">
+                  <label for="txnSourceInput">Transaction source</label>
+                  <input type="text" id="txnSourceInput" placeholder="Source" list="TxnSourceList" class="form-control">
+                </div>
+                <div class="form-group col-sm-4 mt-n1">
+                  <label for="txnTypeInput">Transaction type</label>
+                  <input type="text" id="txnTypeInput" placeholder="Txn Type" list="TxnTypeList" value="Purchase" class="form-control">
+                </div>
+                <div class="form-group col-sm-4 mt-n1">
+                  <label for="txnDate">Transaction date</label>
+                  <input type="date" id="txnDate" value="" class="form-control">
+                </div>
+              </div>
+              <div class="form-row mt-n1">
+                <button type="button" class="btn btn-link p-0" data-toggle="collapse" data-target="#createSalesCollapse" aria-expanded="false" aria-controls="createSalesCollapse">
+                  <img src="public/plus.svg" width="20" height="20" alt="expand-sales-data">
+                  <span class="label label-default">Sales Data</span>
+                </button>
+              </div>
+              <hr class="mt-2 mb-3">
+              <div class="form-row mt-n1 collapse" id="createSalesCollapse">
+                <div class="form-group col-sm-4 mt-n1">
+                  <label for="salePriceInput">Sale price</label>
+                  <input type="number" id="salePriceInput" step=".01" placeholder="Sale Price" class="form-control">
+                </div>
+              </div>
                 <datalist id="TxnTypeList">
                   <option value="Purchase"></option>
                   <option value="Trade"></option>
                   <option value="Pulled"></option>
                 </datalist>
-              <div class="form-row">
-                <div class="col">
-                  <input type="text" id="txnSourceInput" placeholder="Source" list="TxnSourceList" class="form-control mb-2 mr-sm-2 flex-grow-1">
-                  <datalist id="TxnSourceList">
-                    <option value="eBay"></option>
-                    <option value="Blowout Forums"></option>
-                    <option value="/r/baseballcards"></option>
-                    <option value="Card Show"></option>
-                    <option value="Topps/Fanatics"></option>
-                    <option value="Auction House"></option>
-                  </datalist>
-                </div>
-                <div class="col">
-                  <input type="text" id="eBayItemIdInput" placeholder="eBay Item Id" pattern="[\d]{12}" class="form-control mb-2 mr-sm-2">
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="col">
-                  <input type="number" id="purchasePriceInput" step=".01" placeholder="Purchase Price" class="form-control mb-2 mr-sm-2">
-                </div>
-                <div class="col">
-                  <input type="number" id="mktValInput" step=".01" placeholder="Market Value" class="form-control mb-2 mr-sm-2">
-                </div>
-                <div class="col">
-                  <input type="date" id="txnDate" value="" class="form-control mb-2 mr-sm-2">
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="col">
-                  <input type="number" id="gradingFeeInput" placeholder="Grading Fee" class="form-control mb-2 mr-sm-2">
-                </div>
-                <div class="col">
-                  <input type="number" id="salePriceInput" step=".01" placeholder="Sale Price" class="form-control mb-2 mr-sm-2">
-                </div>
-              </div>
+                <datalist id="TxnSourceList">
+                  <option value="eBay"></option>
+                  <option value="Blowout Forums"></option>
+                  <option value="/r/baseballcards"></option>
+                  <option value="Card Show"></option>
+                  <option value="Topps/Fanatics"></option>
+                  <option value="Auction House"></option>
+                </datalist>
+              <div class="mt-2">
                 <button id="add-archived" type="submit" class="btn btn-primary mb-2 flex-grow-1">
                   Add Inventory
                 </button>
+              </div>
               </form>
           </div>
           <div class="modal-footer">
