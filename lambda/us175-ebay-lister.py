@@ -197,10 +197,20 @@ def parse_event_payload(event: dict) -> dict:
 def get_fulfillment_policy_id_for_item(item: dict, payload: dict) -> str:
     listing_type = payload["listingType"]
 
-    if listing_type == "BUY_IT_NOW":
-        listing_price = to_decimal(item.get("MktVal") or 0)
+    if listing_type == "AUCTION":
+        starting_bid = to_decimal(payload["startingBid"])
+        market_value = to_decimal(item.get("MktVal") or 0)
+
+        if (
+            payload.get("expectedSaleOver20")
+            or starting_bid >= decimal.Decimal("20.00")
+            or market_value >= decimal.Decimal("20.00")
+        ):
+            return EBAY_FULFILLMENT_POLICY_ID_OVER20
+
+        listing_price = starting_bid
     else:
-        listing_price = to_decimal(payload["startingBid"])
+        listing_price = to_decimal(item.get("MktVal") or 0)
 
     if listing_price < decimal.Decimal("20.00"):
         return EBAY_FULFILLMENT_POLICY_ID_UNDER20
@@ -241,6 +251,20 @@ def validate_request_payload(payload: dict) -> None:
         if starting_bid <= 0:
             raise BadRequest("startingBid must be greater than 0")
         payload["startingBid"] = starting_bid
+        payload["expectedSaleOver20"] = normalize_optional_bool(payload.get("expectedSaleOver20"))
+
+
+def normalize_optional_bool(value) -> bool:
+    if value is None:
+        return False
+    if isinstance(value, bool):
+        return value
+    normalized = str(value).strip().lower()
+    if normalized in {"true", "1", "yes", "y"}:
+        return True
+    if normalized in {"false", "0", "no", "n", ""}:
+        return False
+    raise BadRequest("expectedSaleOver20 must be true or false")
 
 
 def normalize_yes_no(value, field_name: str) -> str:

@@ -120,13 +120,21 @@ function setEbaySalesResponse(value) {
 function updateStartingBidState() {
   const listingTypeEl = document.getElementById("eBaySalesListingType");
   const startingBidEl = document.getElementById("eBaySalesStartingBid");
+  const expectedSaleOver20El = document.getElementById("eBaySalesExpectedSaleOver20");
   if (!listingTypeEl || !startingBidEl) return;
 
   const isAuction = listingTypeEl.value === "AUCTION";
   startingBidEl.disabled = !isAuction;
   startingBidEl.required = isAuction;
 
-  if (!isAuction) startingBidEl.value = "";
+  if (expectedSaleOver20El) {
+    expectedSaleOver20El.disabled = !isAuction;
+  }
+
+  if (!isAuction) {
+    startingBidEl.value = "";
+    if (expectedSaleOver20El) expectedSaleOver20El.checked = false;
+  }
 }
 
 function resetEbaySalesForm(guid) {
@@ -138,6 +146,7 @@ function resetEbaySalesForm(guid) {
   const allowOffersEl = document.getElementById("eBaySalesAllowOffers");
   const autographedEl = document.getElementById("eBaySalesAutographed");
   const teamEl = document.getElementById("eBaySalesTeam");
+  const expectedSaleOver20El = document.getElementById("eBaySalesExpectedSaleOver20");
   const submitBtn = document.getElementById("eBaySalesSubmitBtn");
 
   if (guidEl) guidEl.value = currentEbaySalesGuid;
@@ -145,6 +154,7 @@ function resetEbaySalesForm(guid) {
   if (allowOffersEl) allowOffersEl.value = "false";
   if (autographedEl) autographedEl.value = "No";
   if (teamEl) teamEl.value = "";
+  if (expectedSaleOver20El) expectedSaleOver20El.checked = false;
   setEbaySalesTitle("");
   if (submitBtn) {
     submitBtn.disabled = false;
@@ -179,6 +189,7 @@ async function submitEbaySalesForm() {
   const listingType = sanitize(document.getElementById("eBaySalesListingType")?.value);
   const startingBidRaw = sanitize(document.getElementById("eBaySalesStartingBid")?.value);
   const allowOffersValue = sanitize(document.getElementById("eBaySalesAllowOffers")?.value);
+  const expectedSaleOver20 = Boolean(document.getElementById("eBaySalesExpectedSaleOver20")?.checked);
   const team = sanitize(document.getElementById("eBaySalesTeam")?.value);
   const autographed = sanitize(document.getElementById("eBaySalesAutographed")?.value);
   const title = normalizeEbayTitleText(document.getElementById("eBaySalesTitle")?.value).slice(0, EBAY_TITLE_MAX_LENGTH).trimEnd();
@@ -220,6 +231,7 @@ async function submitEbaySalesForm() {
 
   if (listingType === "AUCTION") {
     payload.startingBid = Number(startingBidRaw);
+    payload.expectedSaleOver20 = expectedSaleOver20;
   }
 
   try {

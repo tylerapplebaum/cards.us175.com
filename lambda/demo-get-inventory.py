@@ -17,6 +17,7 @@ INDEX_SET_YEAR = os.environ.get('IndexName_SetYear', 'Set-Year-index')
 INDEX_BOX_PLAYER = os.environ.get('IndexName_BoxPlayer', 'BoxNum-PlayerName-index')
 INDEX_PLAYER_SET = os.environ.get('IndexName_PlayerSet', 'PlayerName-Set-index')
 INDEX_MULTIPLAYER = os.environ.get('IndexName_Multiplayer', 'Multiplayer-index')
+EXCLUDED_SET_PLAYER_BOXES = {'X', 'Z1'}
 
 def convert_sets(obj):
     """
@@ -61,7 +62,7 @@ def lambda_handler(event, context):
         SortKeyName = 'PlayerName'
         KeyVal = bodyParsed.get('BoxNum', "")
         SortKeyVal = bodyParsed.get('PlayerName', "")
-        if 'G' in KeyVal:
+        if any(prefix in KeyVal for prefix in ('G', 'T', 'X')):
             LambdaSort = 'PlayerName'
         else:
             LambdaSort = 'CardNum'
@@ -86,6 +87,12 @@ def lambda_handler(event, context):
     AttrVal2 = int(bodyParsed.get('Qty', "0"))
 
     logger.info(f"Using Index: {index}")
+
+    def exclude_set_player_boxes(items):
+        return [
+            item for item in items
+            if item.get('BoxNum') not in EXCLUDED_SET_PLAYER_BOXES
+        ]
 
     def ddbquery():
         lastEvaluatedKey = None
@@ -162,6 +169,9 @@ def lambda_handler(event, context):
             ddbitems = natsorted(ddbitems, key=lambda d: d.get(LambdaSort, ''))
         else:
             ddbitems = ddbquery()
+
+        if search_type in ('set', 'player'):
+            ddbitems = exclude_set_player_boxes(ddbitems)
 
         ddbitems = convert_sets(ddbitems)
     except botocore.exceptions.ClientError as error:
