@@ -29,6 +29,10 @@ def lambda_handler(event, context):
         "headers": {
             "location": [{"key": "Location", "value": logout_uri}],
             "set-cookie": [{"key": "Set-Cookie", "value": c} for c in expired_cookies],
+            "cache-control": [{
+                "key": "Cache-Control",
+                "value": "no-store, no-cache, max-age=0, must-revalidate, private",
+            }],
         },
     }
 

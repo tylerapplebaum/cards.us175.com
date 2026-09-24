@@ -120,6 +120,10 @@ def lambda_handler(event, context):
         "headers": {
             "location": [{"key": "location", "value": redirect_url}],
             "set-cookie": set_cookie_headers,
+            "cache-control": [{
+                "key": "Cache-Control",
+                "value": "no-store, no-cache, max-age=0, must-revalidate, private",
+            }],
         },
     }
     return response
@@ -156,7 +160,11 @@ def _error_response(message: str):
         "statusDescription": "Bad Request",
         "body": message,
         "headers": {
-            "content-type": [{"key": "Content-Type", "value": "text/plain"}]
+            "content-type": [{"key": "Content-Type", "value": "text/plain"}],
+            "cache-control": [{
+                "key": "Cache-Control",
+                "value": "no-store, no-cache, max-age=0, must-revalidate, private",
+            }],
         }
     }
 

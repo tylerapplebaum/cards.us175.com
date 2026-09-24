@@ -180,6 +180,10 @@ def create_redirect_to_login_response(request, requestedUri=None, queryString=No
                     "value": login_url,
                 },
             ],
+            "cache-control": [{
+                "key": "Cache-Control",
+                "value": "no-store, no-cache, max-age=0, must-revalidate, private",
+            }],
         },
     }
     return response
@@ -213,6 +217,10 @@ def create_redirect_to_refresh_response(requestedUri=None, queryString=None):
                     "value": refresh_url,
                 },
             ],
+            "cache-control": [{
+                "key": "Cache-Control",
+                "value": "no-store, no-cache, max-age=0, must-revalidate, private",
+            }],
         },
     }
     return response

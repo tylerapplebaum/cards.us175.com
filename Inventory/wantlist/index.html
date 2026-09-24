@@ -20,6 +20,15 @@
   <link rel="stylesheet" type="text/css" href="../../vendor/animate/animate.css">
   <link rel="stylesheet" type="text/css" href="../../vendor/select2/select2.min.css">
   <link rel="stylesheet" type="text/css" href="../../vendor/perfect-scrollbar/perfect-scrollbar.css">
+  <style>
+    @media (max-width: 991.98px) {
+      .navbar-nav {
+        align-items: stretch;
+        text-align: left;
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -27,11 +36,11 @@
       <img src="../public/icon.svg" width="30" height="30" class="d-inline-block align-top" alt="us175-icon">
       US175
     </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav mr-auto align-items-center">
+      <ul class="navbar-nav mr-auto align-items-lg-center">
         <li class="nav-item">
           <a class="nav-link text-nowrap" href="https://test.us175.com/Inventory/">Inventory</a>
         </li>
@@ -44,12 +53,26 @@
         <li class="nav-item active">
           <a class="nav-link" href="https://test.us175.com/Inventory/wantlist/">Wantlist <span class="sr-only">(current)</span></a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://inv.us175.com/landing/">Landing</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://test.us175.com/feed/">Feed</a>
+        </li>
       </ul>
       <span class="navbar-text text-muted mr-2 small">
         Updated: <span id="generated-at">-</span>
       </span>
     </div>
   </nav>
+  <script>
+    const menuToggle = document.querySelector('.navbar-toggler');
+    const menu = document.getElementById('navbarSupportedContent');
+    menuToggle.addEventListener('click', () => {
+      const expanded = menu.classList.toggle('show');
+      menuToggle.setAttribute('aria-expanded', String(expanded));
+    });
+  </script>
 
   <div class="container-fluid">
     <div class="input-group">
@@ -70,9 +93,6 @@
         <span class="badge"><img src="../../img/download_icon.svg" width="20" height="20" alt="download results"></span>
         Results <span class="badge badge-light" id="num-results">0</span>
       </button>
-      <div class="btn-group ml-1" role="group" aria-label="Table view selectors">
-        <button type="button" class="btn btn-secondary mb-3" disabled>Checklist</button>
-      </div>
     </div>
   </div>
 

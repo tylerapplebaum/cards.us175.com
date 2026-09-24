@@ -26,15 +26,12 @@ function renderHeaders() {
   `;
 }
 
-function applyMobileLabels(rowEl) {
-  const headers = Array.from(document.querySelectorAll("#itemsTable thead th"))
-    .filter((th) => !th.hidden)
-    .map((th) => th.textContent.trim());
+function applyMobileLabels(rowEl, headers) {
   const cells = Array.from(rowEl.querySelectorAll("td")).filter((td) => !td.hidden);
   cells.forEach((td, i) => td.setAttribute("data-label", headers[i] || ""));
 }
 
-function renderRows(items) {
+async function renderRows(items) {
   const tbody = document.querySelector("#itemsTable tbody");
   const tfoot = document.querySelector("#itemsTable tfoot tr");
   if (!tbody || !tfoot) return;
@@ -42,21 +39,32 @@ function renderRows(items) {
   tbody.innerHTML = "";
   tfoot.innerHTML = "";
 
-  items.forEach((item) => {
-    const row = document.createElement("tr");
-    row.dataset.guid = sanitizeValue(item.guid);
-    row.innerHTML = `
-      <td class="column0" hidden>${sanitizeValue(item.guid)}</td>
-      <td class="column1">${sanitizeValue(item.Year)}</td>
-      <td class="column2">${sanitizeValue(item.Set)}</td>
-      <td class="column3">${sanitizeValue(item.Subset)}</td>
-      <td class="column4">${sanitizeValue(item.CardNum)}</td>
-      <td class="column5">${sanitizeValue(item.PlayerName)}</td>
-      <td class="column6">${sanitizeValue(item.Qty)}</td>
-    `;
-    applyMobileLabels(row);
-    tbody.appendChild(row);
-  });
+  const headers = Array.from(document.querySelectorAll("#itemsTable thead th"))
+    .filter((th) => !th.hidden)
+    .map((th) => th.textContent.trim());
+  const batchSize = 100;
+  for (let start = 0; start < items.length; start += batchSize) {
+    const fragment = document.createDocumentFragment();
+    items.slice(start, start + batchSize).forEach((item) => {
+      const row = document.createElement("tr");
+      row.dataset.guid = sanitizeValue(item.guid);
+      row.innerHTML = `
+        <td class="column0" hidden>${sanitizeValue(item.guid)}</td>
+        <td class="column1">${sanitizeValue(item.Year)}</td>
+        <td class="column2">${sanitizeValue(item.Set)}</td>
+        <td class="column3">${sanitizeValue(item.Subset)}</td>
+        <td class="column4">${sanitizeValue(item.CardNum)}</td>
+        <td class="column5">${sanitizeValue(item.PlayerName)}</td>
+        <td class="column6">${sanitizeValue(item.Qty)}</td>
+      `;
+      applyMobileLabels(row, headers);
+      fragment.appendChild(row);
+    });
+    tbody.appendChild(fragment);
+    if (start + batchSize < items.length) {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+  }
 }
 
 function applyFilter() {
@@ -129,10 +137,14 @@ function setGeneratedAt(value) {
   el.textContent = Number.isNaN(dt.valueOf()) ? sanitizeValue(value) : dt.toLocaleString();
 }
 
-function renderView() {
+async function renderView() {
   renderHeaders();
-  renderRows(wantlistItems);
-  applyFilter();
+  await renderRows(wantlistItems);
+  if (document.getElementById("tableFilter")?.value) {
+    applyFilter();
+  } else {
+    document.getElementById("num-results").textContent = String(wantlistItems.length);
+  }
 }
 
 async function loadWantlist() {
@@ -156,7 +168,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     await loadWantlist();
-    renderView();
+    await renderView();
     setStatus(`Loaded ${wantlistItems.length} wantlist cards.`, "success");
   } catch (err) {
     setStatus(`Could not load wantlist data: ${err.message}`, "danger");
