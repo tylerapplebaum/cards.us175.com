@@ -520,9 +520,8 @@ tbody tr:hover {
   font-size: 0.875rem;
   white-space: nowrap;
 }
-@media (max-width: 359.98px) {
-  .inventory-utilities { padding: 0 0.5rem; }
-  .inventory-utility-links > a { font-size: 0.75rem; }
+@media (max-width: 767.98px) {
+  .inventory-utilities { display: none; }
 }
 #qrLabelsModal #qrLabelStart {
   width: 9rem;

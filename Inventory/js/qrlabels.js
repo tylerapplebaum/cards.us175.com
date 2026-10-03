@@ -10,15 +10,21 @@
 
     function collectVisibleItems(table) {
         const seen = new Set();
+        // CertNumber is not rendered in every table view, so read it by GUID.
+        const inventory = new Map((root.exportInventoryData || root.lastFetchedData?.body || [])
+            .map(item => [String(item.guid), item]));
         return Array.from(table.querySelectorAll('tbody tr[data-guid]'))
             .filter(row => !row.hidden && row.getClientRects().length > 0 &&
                 getComputedStyle(row).visibility !== 'hidden')
-            .map(row => ({
-                guid: row.dataset.guid.trim(),
-                description: ['column1', 'column2', 'column4', 'column5']
+            .map(row => {
+                const guid = row.dataset.guid.trim();
+                const description = ['column1', 'column2', 'column3', 'column4', 'column5']
                     .map(column => row.querySelector(`.${column}`)?.textContent.trim())
-                    .filter(Boolean).join(' · ')
-            }))
+                    .filter(Boolean);
+                const certNumber = String(inventory.get(guid)?.CertNumber ?? '').trim();
+                if (certNumber) description.push(`CertNum: ${certNumber}`);
+                return { guid, description: description.join(' · ') };
+            })
             .filter(item => {
                 if (seen.has(item.guid)) return false;
                 seen.add(item.guid);
