@@ -506,7 +506,24 @@ tbody tr:hover {
 
 
 /* Inventory footer utilities and screen-only QR previews. */
-.inventory-utilities #qrLabelStart {
+.inventory-utilities {
+  box-sizing: border-box;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+.inventory-utilities > a {
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+@media (max-width: 359.98px) {
+  .inventory-utilities { padding: 0 0.5rem; }
+  .inventory-utilities > a { font-size: 0.75rem; }
+}
+#qrLabelsModal #qrLabelStart {
   width: 9rem;
 }
 .qr-label-preview {
