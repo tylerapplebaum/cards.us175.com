@@ -510,13 +510,19 @@ tbody tr:hover {
   gap: 0.5rem;
   padding: 0 1rem;
 }
-.inventory-utilities > a {
+.inventory-utility-links {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-shrink: 0;
+}
+.inventory-utility-links > a {
   font-size: 0.875rem;
   white-space: nowrap;
 }
 @media (max-width: 359.98px) {
   .inventory-utilities { padding: 0 0.5rem; }
-  .inventory-utilities > a { font-size: 0.75rem; }
+  .inventory-utility-links > a { font-size: 0.75rem; }
 }
 #qrLabelsModal #qrLabelStart {
   width: 9rem;
