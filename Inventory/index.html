@@ -12,6 +12,9 @@
   <script src="../vendor/html5-qrcode/html5-qrcode.min.js" defer></script>
   <script src="js/guidscanner.js" defer></script>
   <script src="js/searchandfilter.js" defer></script>
+  <script src="../vendor/qrcode-generator/qrcode.js" defer></script>
+  <script src="../vendor/pdf-lib/pdf-lib.min.js" defer></script>
+  <script src="js/qrlabels.js" defer></script>
   <script src="js/lookups.js" defer></script>
   <script src="js/viewselector.js" defer></script>
   <script src="js/importCSV.js" defer></script>
@@ -514,6 +517,30 @@
       </div>
     </div>
   </div>
+  <footer class="inventory-utilities border-top bg-light p-3 mt-3" aria-labelledby="inventoryUtilitiesTitle">
+    <h2 id="inventoryUtilitiesTitle" class="h5">Inventory utilities</h2>
+    <p class="mb-2">Generate one GUID QR label per visible item, in the current result order. Filtered-out items are excluded.</p>
+    <div class="d-flex flex-wrap align-items-end">
+      <div class="form-group mr-3">
+        <label for="qrLabelStart">Starting label (1–80)</label>
+        <input id="qrLabelStart" class="form-control" type="number" min="1" max="80" step="1" value="1" aria-describedby="qrLabelPrintHelp">
+      </div>
+      <div class="form-group mr-3">
+        <div class="custom-control custom-checkbox">
+          <input id="qrLabelGuides" class="custom-control-input" type="checkbox">
+          <label class="custom-control-label" for="qrLabelGuides">Include outlines for an alignment test</label>
+        </div>
+      </div>
+      <button id="generateQrLabels" type="button" class="btn btn-primary mb-3 mr-2">Generate QR codes</button>
+      <a id="qrLabelDownload" class="d-none btn btn-outline-primary mb-3" download>Download label PDF</a>
+    </div>
+    <p id="qrLabelPrintHelp" class="small text-muted mb-2">Avery 94102 · ¾-inch square · 80 labels per Letter sheet. Labels run left to right, then top to bottom. Print the downloaded PDF at Actual size / 100%, with Fit to page turned off. Test alignment on plain paper first.</p>
+    <p id="qrLabelStatus" role="status" aria-live="polite" class="mb-2"></p>
+    <details id="qrLabelPreviewDetails" class="d-none">
+      <summary>Preview QR codes and item order</summary>
+      <div id="qrLabelPreview" class="qr-label-preview mt-3"></div>
+    </details>
+  </footer>
   <script src="../vendor/jquery/jquery-3.2.1.min.js"></script>
   <script src="../vendor/bootstrap/js/popper.js"></script>
   <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
