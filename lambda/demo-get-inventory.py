@@ -56,6 +56,25 @@ def lambda_handler(event, context):
     # Determine which index to use
     search_type = bodyParsed.get('SearchType', 'set').lower()  # default: set
 
+    if search_type == 'guid':
+        guid = bodyParsed.get('guid')
+        if not isinstance(guid, str) or not guid.strip():
+            return {
+                'StatusCode': 400,
+                'headers': {'Content-Type': 'application/json'},
+                'body': [],
+                'message': 'A non-empty guid is required.'
+            }
+
+        # Read the primary key directly, without index queries or search filters.
+        result = table.get_item(Key={'guid': guid.strip()})
+        item = result.get('Item')
+        return {
+            'StatusCode': 200,
+            'headers': {'Content-Type': 'application/json'},
+            'body': convert_sets([item] if item is not None else [])
+        }
+
     if search_type == 'box':
         index = INDEX_BOX_PLAYER
         KeyName = 'BoxNum'

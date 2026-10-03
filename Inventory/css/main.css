@@ -458,6 +458,27 @@ tbody tr:hover {
   }
 }
 
+@media (max-width: 575.98px) {
+  #existingForm > #subsetSearchList {
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  #existingForm > [data-target="#staticBackdropBoxInfo"] {
+    flex: 0 0 46px;
+    margin-bottom: 0.5rem;
+  }
+
+  #existingForm > #playerSearchList,
+  #existingForm > #boxSearchList,
+  #existingForm > #guidSearchInput,
+  #existingForm > #queryYear {
+    flex: 0 0 calc(100% - 46px);
+    width: calc(100% - 46px);
+    min-width: 0;
+  }
+}
+
 @media (max-width: 576px) {
   .container-table100 {
     padding-left: 15px;

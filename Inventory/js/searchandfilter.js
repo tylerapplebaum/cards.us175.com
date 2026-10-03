@@ -6,6 +6,13 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("subsetSearchList")?.classList.remove("d-none");
     document.getElementById("playerSearchList")?.classList.add("d-none");
     document.getElementById("boxSearchList")?.classList.add("d-none");
+    document.getElementById("guidSearchInput")?.classList.add("d-none");
+    document.getElementById("scanGuidButton")?.addEventListener("click", startGuidScanner);
+    document.getElementById("cancelGuidScan")?.addEventListener("click", stopGuidScanner);
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) stopGuidScanner();
+    });
+    window.addEventListener("pagehide", stopGuidScanner);
     const toggleButton = document.getElementById("toggleSearchButton");
     if (toggleButton) toggleButton.textContent = "Search: Set";
 });
@@ -13,18 +20,22 @@ function toggleSetPlayerBox() {
     const sections = [
     { id: "setSearchList", label: "Set" },
     { id: "playerSearchList", label: "Player" },
-    { id: "boxSearchList", label: "Box" }
+    { id: "boxSearchList", label: "Box" },
+    { id: "guidSearchInput", label: "GUID" }
     ];
 
     const toggleButton = document.getElementById("toggleSearchButton");
     const queryYear = document.getElementById("queryYear");
     const subsetSearchList = document.getElementById("subsetSearchList");
-    const qty = document.getElementById("qty");
+    // const qty = document.getElementById("qty");
 
     // Find which section is currently visible
     const visibleIndex = sections.findIndex(
     s => !document.getElementById(s.id).classList.contains("d-none")
     );
+
+    stopGuidScanner();
+    setSearchStatus("");
 
     // Hide all sections
     sections.forEach(s => document.getElementById(s.id).classList.add("d-none"));
@@ -43,6 +54,12 @@ function toggleSetPlayerBox() {
         console.log("Search type set to:", searchtype);
     }
 
+    const guidInput = document.getElementById("guidSearchInput");
+    const isGuid = searchtype === "guid";
+    guidInput.disabled = !isGuid;
+    guidInput.required = isGuid;
+    document.getElementById("scanGuidButton").classList.toggle("d-none", !isGuid);
+
     // Handle Set search grouping
     if (nextSection.id === "setSearchList") {
         queryYear?.classList.remove("d-none");
@@ -59,7 +76,9 @@ function toggleSetPlayerBox() {
     document.getElementById("queryYear").value = "";
     document.getElementById("boxSearchList").value = "";
     document.getElementById("playerSearchList").value = "";
-    qty.value = "0";
+    guidInput.value = "";
+    if (isGuid) guidInput.focus();
+    // qty.value = "0";
 
     console.log("Cleared previous search inputs.");
 }
