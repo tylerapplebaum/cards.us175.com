@@ -72,9 +72,6 @@
       </ul>
       <!-- Form for searching existing transactions -->
       <form id="existingForm" class="form-inline">
-        <button type="button" href="#" class="btn btn-outline*" data-toggle="modal" data-target="#staticBackdropBoxInfo">
-          <img src="public/info.svg" width="20" height="20" class="d-inline-block align-top" alt="box-title-info" title="Box details">
-        </button>
         <select class="d-none custom-select form-control mb-2 mr-sm-2" id="playerSearchList">
           <option id="list-player" selected value="">Select player...</option>
         </select>
@@ -519,6 +516,9 @@
   </div>
   <footer class="inventory-utilities border-top bg-light mt-3" aria-label="Inventory utilities">
     <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#qrLabelsModal">Generate QR codes</button>
+    <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#staticBackdropBoxInfo" aria-label="Box details" title="Box details">
+      <img src="public/info.svg" width="20" height="20" class="d-inline-block align-top" alt="">
+    </button>
     <a href="templates/inventory_template_v1.csv" download>Bulk Upload Template</a>
   </footer>
   <div class="modal fade" id="qrLabelsModal" tabindex="-1" aria-labelledby="qrLabelsModalTitle" aria-hidden="true">
